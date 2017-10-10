@@ -8,4 +8,5 @@ type Review struct {
 	Text string
 	Date time.Time
 	Sentiment uint
+	Stars uint
 }
