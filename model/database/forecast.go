@@ -1,10 +1,10 @@
 package database
 
-import "time"
+import "github.com/jinzhu/gorm"
 
 type Forecast struct {
-	ID uint `gorm:"primary_key";gorm:"AUTO_INCREMENT"`
-	Item Item `gorm:"ForeignKey:Item;AssociationForeignKey:Refer"`
-	Price float64
-	Date time.Time
+	gorm.Model
+	Item    Item     `gorm:"ForeignKey:Item"`
+	Price   float64
+	Date    string
 }

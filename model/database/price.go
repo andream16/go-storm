@@ -1,11 +1,10 @@
 package database
 
-import "time"
-
+import "github.com/jinzhu/gorm"
 
 type Price struct {
-	ID uint `gorm:"primary_key";gorm:"AUTO_INCREMENT"`
-	Item Item `gorm:"ForeignKey:Item;AssociationForeignKey:Refer"`
+	gorm.Model
+	Item  Item     `gorm:"ForeignKey:Item"`
 	Price float64
-	Date time.Time
+	Date  string
 }

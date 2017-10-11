@@ -1,7 +1,9 @@
 package database
 
+import "github.com/jinzhu/gorm"
+
 type Category struct {
-	ID uint `gorm:"primary_key"`
-	Item []Item `gorm:"ForeignKey:Item;AssociationForeignKey:Refer"`
+	gorm.Model
+	Item []Item  `gorm:"ForeignKey:Item"`
 	Name string
 }

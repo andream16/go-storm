@@ -1,12 +1,14 @@
 package database
 
-import "time"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 type Review struct {
-	ID uint `gorm:"primary_key";gorm:"AUTO_INCREMENT"`
-	Item Item `gorm:"ForeignKey:Item;AssociationForeignKey:Refer"`
-	Text string
-	Date time.Time
+	gorm.Model
+	Item 	  Item    `gorm:"ForeignKey:Item"`
+	Text 	  string
+	Date 	  string
 	Sentiment uint
-	Stars uint
+	Stars     uint
 }

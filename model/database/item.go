@@ -1,12 +1,11 @@
 package database
 
+import "github.com/jinzhu/gorm"
+
 type Item struct {
-	Item         string `gorm:"primary_key"`
-	Manufacturer string `gorm:"ForeignKey:Manufacturer;AssociationForeignKey:Refer"`
-	Category     []Category `gorm:"ForeignKey:Category;AssociationForeignKey:Refer"`
-	Reviews      []Review `gorm:"ForeignKey:Review;AssociationForeignKey:Refer"`
-	Prices       []Price `gorm:"ForeignKey:Price;AssociationForeignKey:Refer"`
-	Forecast     []Forecast `gorm:"ForeignKey:Forecast;AssociationForeignKey:Refer"`
+	gorm.Model
+	Item         string 	  `gorm:"primary_key"`
+	Manufacturer Manufacturer `gorm:"ForeignKey:Name"`
 	URL 		 string
 	Image 		 string
 	Title 	     string

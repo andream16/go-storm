@@ -1,10 +1,10 @@
 package database
 
-import "time"
+import "github.com/jinzhu/gorm"
 
 type Currency struct {
-	ID uint `gorm:"primary_key";gorm:"AUTO_INCREMENT"`
-	Name string
-	Date time.Time
-	Value float64
+	gorm.Model
+	Name    string  `gorm:"primary_key"`
+	Date    string
+	Value   float64
 }

@@ -1,10 +1,10 @@
 package database
 
-import "time"
+import "github.com/jinzhu/gorm"
 
 type Trend struct {
-	ID uint `gorm:"primary_key";gorm:"AUTO_INCREMENT"`
-	Manufacturer string `gorm:"ForeignKey:Manufacturer;AssociationForeignKey:Refer"`
-	Date time.Time
-	Value float64
+	gorm.Model
+	Manufacturer Manufacturer
+	Date 		 string
+	Value		 float64
 }
