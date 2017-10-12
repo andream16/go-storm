@@ -1,10 +1,8 @@
 package database
 
-import "github.com/jinzhu/gorm"
-
 type Forecast struct {
-	gorm.Model
-	Item    Item     `gorm:"ForeignKey:Item"`
+	ID      uint       `storm:"key:primary_key"`
+	Item    string     `storm:"key:foreign_key;references:Item.Item"`
 	Price   float64
 	Date    string
 }

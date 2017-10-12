@@ -1,43 +1,64 @@
 package psql 
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	model "github.com/andream16/go-storm/model/database"
+	"reflect"
+	"strings"
+	"fmt"
 )
-
-var psql = gorm.DB{}
-
 var tables = map[string]interface{} {
-	"Item" 		   : &model.Item{},
-	"Price"        : &model.Price{},
-	"Review"       : &model.Review{},
-	"Category"     : &model.Category{},
-	"Forecast" 	   : &model.Forecast{},
-	"Manufacturer" : &model.Manufacturer{},
-	"Trend"        : &model.Trend{},
-	"Currency"     : &model.Currency{},
+	"Manufacturer" : model.Manufacturer{},
+	"Trend"        : model.Trend{},
+	"Item" 		   : model.Item{},
+	"Price"        : model.Price{},
+	"Review"       : model.Review{},
+	"Category"     : model.Category{},
+	"Forecast" 	   : model.Forecast{},
+	"Currency"     : model.Currency{},
 }
 
-func InitializePsql() (*gorm.DB, error) {
-	db, dbErr := gorm.Open("postgres", "host=localhost user=postgres dbname=priceprobe sslmode=disable"); if dbErr != nil {
-		return db, dbErr
-	}
-	psql = *db
-	CreateTables()
-	defer db.Close()
-	return db, nil
+type StormTag struct {
+	Key         string
+	References  string
+	Constraint  string
 }
 
-func GetDbInstance() *gorm.DB {
-	return &psql
+type Table struct {
+	Name    string
+	Fields  []string
+	Types   []interface{}
+	Options []Option
+}
+
+type Option struct {
+	Name string
+	Value interface{}
 }
 
 func CreateTables() {
-	for k, t := range tables {
-		if !psql.HasTable(k) {
-			psql.CreateTable(t)
+	var finalTables []Table
+	for tableName := range tables {
+		var fields    []string
+		var types     []interface{}
+		var stormTags []Option
+		currentModel := tables[tableName]
+		typeOfModel := reflect.TypeOf(currentModel)
+		for i := 0; i < typeOfModel.NumField(); i++ {
+			finalTables[i].Name   = strings.ToLower(tableName)
+			finalTables[i].Fields = append(fields, strings.ToLower(typeOfModel.Field(i).Name))
+			finalTables[i].Types  = append(types, typeOfModel.Field(i).Type)
+			tagsEntries := strings.Split(typeOfModel.Field(i).Tag.Get("storm"), ";")
+			for t := range tagsEntries {
+				var o Option
+				s := strings.Split(tagsEntries[t], ":")
+				o.Name = s[0]
+				o.Value = s[1]
+				stormTags = append(stormTags, o)
+			}
+			finalTables[i].Options = stormTags
 		}
 	}
-	psql.Model(&model.Price{}).Related(&model.Item{})
+	for k := range finalTables {
+		fmt.Println(finalTables[k].Name, finalTables[k].Fields, finalTables[k].Types, finalTables[k].Options)
+	}
 }

@@ -1,14 +1,10 @@
 package database
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 type Review struct {
-	gorm.Model
-	Item 	  Item    `gorm:"ForeignKey:Item"`
+	ID        uint      `storm:"key:primary_key;"`
+	Item 	  string    `storm:"key:foreign_key;references:Item.Item"`
 	Text 	  string
 	Date 	  string
-	Sentiment uint
-	Stars     uint
+	Sentiment int       `storm:"constraint:value[1,5]"`
+	Stars     int		`storm:"constraint:value[0,1]"`
 }

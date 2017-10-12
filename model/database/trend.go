@@ -1,10 +1,8 @@
 package database
 
-import "github.com/jinzhu/gorm"
-
 type Trend struct {
-	gorm.Model
-	Manufacturer Manufacturer
+	ID           uint 	    `storm:"key:primary_key"`
+	Manufacturer string		`storm:"key:foreign_key;references:Manufacturer.Name"`
 	Date 		 string
 	Value		 float64
 }
