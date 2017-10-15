@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"github.com/andream16/go-storm/shared/response"
+	"github.com/andream16/go-storm/shared/handler/response"
 )
 
 func PingHandler (w http.ResponseWriter, r *http.Request) {

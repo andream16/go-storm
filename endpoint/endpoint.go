@@ -25,7 +25,7 @@ func InitializeEndpoint(conf *configuration.Configuration, db *sql.DB) {
 	fmt.Println("Initializing endpoints ...")
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET, POST, UPDATE, DELETE"},
+		AllowedMethods: []string{"GET, POST, PUT, DELETE"},
 	})
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", 			    pingHandler.PingHandler)
@@ -39,7 +39,7 @@ func InitializeEndpoint(conf *configuration.Configuration, db *sql.DB) {
 	mux.HandleFunc("/trend", 			trendHandler.TrendHandler(db))
 	port := strconv.Itoa(conf.Server.Port)
 	n := negroni.Classic(); n.Use(c); n.UseHandler(mux)
-	fmt.Println("Started server at port :" + port + ". Now listening . . .")
+	fmt.Println("Started serversharer at port :" + port + ". Now listening . . .")
 	// Bind to a port and pass our router in
 	log.Fatal(http.ListenAndServe(strings.Join([]string{":", port}, ""), n))
 }
