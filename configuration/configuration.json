@@ -1,0 +1,14 @@
+{
+  "SERVER" : {
+    "HOST" : "localhost",
+    "API"  : "http://www.vocalware.com/tts/gen.php",
+    "PORT" : 8080
+  },
+  "DATABASE" : {
+    "DRIVERNAME" : "postgres",
+    "DBNAME"     : "priceprobe",
+    "USER"       : "postgres",
+    "HOST"       : "localhost",
+    "SSLMODE"    : "disable"
+  }
+}

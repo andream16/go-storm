@@ -1,64 +1,53 @@
-package psql 
+package psql
 
 import (
-	model "github.com/andream16/go-storm/model/database"
-	"reflect"
-	"strings"
 	"fmt"
+	"database/sql"
+	_ "github.com/lib/pq"
+	"github.com/go-errors/errors"
+	"github.com/andream16/go-storm/configuration"
+	"github.com/andream16/go-storm/psql/sequence"
+	"github.com/andream16/go-storm/psql/table"
 )
-var tables = map[string]interface{} {
-	"Manufacturer" : model.Manufacturer{},
-	"Trend"        : model.Trend{},
-	"Item" 		   : model.Item{},
-	"Price"        : model.Price{},
-	"Review"       : model.Review{},
-	"Category"     : model.Category{},
-	"Forecast" 	   : model.Forecast{},
-	"Currency"     : model.Currency{},
+
+// Initializes connection to Postgresql client and creates tables.
+func InitializePostgresql(conf *configuration.Configuration) error {
+	fmt.Println(fmt.Sprintf("Connecting to Postgresql with credentials: user=%s dbname=%s sslmode=%s ...", conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE))
+	db, dbErr := sql.Open(conf.Database.DRIVERNAME, fmt.Sprintf("user=%s dbname=%s sslmode=%s",
+				        conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE)); if dbErr != nil {
+		fmt.Println("Unable to connect to Postgresql, got error: ", errors.New(dbErr))
+		return dbErr
+	}
+	fmt.Println("Successfully connected to Postgresql. Now creating sequences ...")
+	createSequences(db)
+	fmt.Println("Sequences done. Now creating tables . . .")
+	createTables(db)
+	fmt.Println("Tables done. Postgresql initialization done.")
+	return nil
 }
 
-type StormTag struct {
-	Key         string
-	References  string
-	Constraint  string
-}
-
-type Table struct {
-	Name    string
-	Fields  []string
-	Types   []interface{}
-	Options []Option
-}
-
-type Option struct {
-	Name string
-	Value interface{}
-}
-
-func CreateTables() {
-	var finalTables []Table
-	for tableName := range tables {
-		var fields    []string
-		var types     []interface{}
-		var stormTags []Option
-		currentModel := tables[tableName]
-		typeOfModel := reflect.TypeOf(currentModel)
-		for i := 0; i < typeOfModel.NumField(); i++ {
-			finalTables[i].Name   = strings.ToLower(tableName)
-			finalTables[i].Fields = append(fields, strings.ToLower(typeOfModel.Field(i).Name))
-			finalTables[i].Types  = append(types, typeOfModel.Field(i).Type)
-			tagsEntries := strings.Split(typeOfModel.Field(i).Tag.Get("storm"), ";")
-			for t := range tagsEntries {
-				var o Option
-				s := strings.Split(tagsEntries[t], ":")
-				o.Name = s[0]
-				o.Value = s[1]
-				stormTags = append(stormTags, o)
-			}
-			finalTables[i].Options = stormTags
+func createSequences(db *sql.DB) {
+	sequences := sequence.SEQUENCES
+	for k := range sequences {
+		_, sequenceError := db.Query(sequences[k]); if sequenceError != nil {
+			fmt.Println(fmt.Sprintf("unable to create sequence for %s, error: %s", k, sequenceError))
+		} else {
+			fmt.Println(fmt.Sprintf("created sequence for %s", k))
 		}
 	}
-	for k := range finalTables {
-		fmt.Println(finalTables[k].Name, finalTables[k].Fields, finalTables[k].Types, finalTables[k].Options)
+}
+
+func createTables(db *sql.DB) {
+	order := table.ORDER
+	tableNames := table.TABLES
+	tableQueries := table.CREATETABLES
+	for _, v := range order {
+		_, tableError := db.Exec(tableQueries[tableNames[v]]); if tableError != nil {
+			fmt.Println(fmt.Sprintf("unable to create table %s, error: %s", v, tableError))
+		} else {
+			fmt.Println(fmt.Sprintf("created table %s", v))
+		}
 	}
 }
+
+
