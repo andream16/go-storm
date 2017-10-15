@@ -5,6 +5,7 @@ import (
 	"os"
 	"github.com/andream16/go-storm/psql"
 	"github.com/andream16/go-storm/configuration"
+	"github.com/andream16/go-storm/endpoint"
 )
 
 func main() {
@@ -12,7 +13,8 @@ func main() {
 	fmt.Println("Setting up configuration . . .")
 	conf := configuration.InitConfiguration()
 	fmt.Println("Successfully got configuration! Setting up Postgresql . . .")
-	pgErr := psql.InitializePostgresql(&conf); if pgErr != nil {
+	db, pgErr := psql.InitializePostgresql(&conf); if pgErr != nil {
 		os.Exit(1)
 	}
+	endpoint.InitializeEndpoint(&conf, db)
 }

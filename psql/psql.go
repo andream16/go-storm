@@ -11,19 +11,19 @@ import (
 )
 
 // Initializes connection to Postgresql client and creates tables.
-func InitializePostgresql(conf *configuration.Configuration) error {
+func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	fmt.Println(fmt.Sprintf("Connecting to Postgresql with credentials: user=%s dbname=%s sslmode=%s ...", conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE))
 	db, dbErr := sql.Open(conf.Database.DRIVERNAME, fmt.Sprintf("user=%s dbname=%s sslmode=%s",
 				        conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE)); if dbErr != nil {
 		fmt.Println("Unable to connect to Postgresql, got error: ", errors.New(dbErr))
-		return dbErr
+		return db, dbErr
 	}
 	fmt.Println("Successfully connected to Postgresql. Now creating sequences ...")
 	createSequences(db)
 	fmt.Println("Sequences done. Now creating tables . . .")
 	createTables(db)
 	fmt.Println("Tables done. Postgresql initialization done.")
-	return nil
+	return db, nil
 }
 
 func createSequences(db *sql.DB) {
@@ -39,10 +39,9 @@ func createSequences(db *sql.DB) {
 
 func createTables(db *sql.DB) {
 	order := table.ORDER
-	tableNames := table.TABLES
 	tableQueries := table.CREATETABLES
 	for _, v := range order {
-		_, tableError := db.Exec(tableQueries[tableNames[v]]); if tableError != nil {
+		_, tableError := db.Exec(tableQueries[v]); if tableError != nil {
 			fmt.Println(fmt.Sprintf("unable to create table %s, error: %s", v, tableError))
 		} else {
 			fmt.Println(fmt.Sprintf("created table %s", v))
