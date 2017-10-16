@@ -2,8 +2,8 @@ package errortostatus
 
 import "net/http"
 
-func ErrorAsStringToStatus(err error, w http.ResponseWriter) (http.ResponseWriter) {
-	switch err.Error() {
+func ErrorAsStringToStatus(err string, w http.ResponseWriter) (http.ResponseWriter) {
+	switch err {
 	case "serverError":
 		w.WriteHeader(http.StatusInternalServerError)
 		break
