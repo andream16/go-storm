@@ -8,6 +8,7 @@ import (
 	"github.com/andream16/go-storm/configuration"
 	"github.com/andream16/go-storm/psql/sequence"
 	"github.com/andream16/go-storm/psql/table"
+	"github.com/andream16/go-storm/psql/insert"
 )
 
 // Initializes connection to Postgresql client and creates tables.
@@ -22,7 +23,9 @@ func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	createSequences(db)
 	fmt.Println("Sequences done. Now creating tables . . .")
 	createTables(db)
-	fmt.Println("Tables done. Postgresql initialization done.")
+	fmt.Println("Tables done. Now inserting default rows . . .")
+	defaultInserts(db)
+	fmt.Println("Inserts done. Postgresql initialization done.")
 	return db, nil
 }
 
@@ -45,6 +48,17 @@ func createTables(db *sql.DB) {
 			fmt.Println(fmt.Sprintf("unable to create table %s, error: %s", v, tableError))
 		} else {
 			fmt.Println(fmt.Sprintf("created table %s", v))
+		}
+	}
+}
+
+func defaultInserts(db *sql.DB) {
+	insertQueries := insert.INSERTS
+	for _, query := range insertQueries {
+		_, insertError := db.Exec(query); if insertError != nil {
+			fmt.Println(fmt.Sprintf("unable to insert row %s, error: %s", query, insertError))
+		} else {
+			fmt.Println(fmt.Sprintf("inserted row %s", query))
 		}
 	}
 }
