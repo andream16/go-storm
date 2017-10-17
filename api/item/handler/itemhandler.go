@@ -9,6 +9,7 @@ import (
 	"github.com/andream16/go-storm/api/item/service"
 	"encoding/json"
 	"github.com/andream16/go-storm/model/request"
+	"strconv"
 )
 
 var itemHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) (interface{}, string) {
@@ -32,23 +33,39 @@ func ItemHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Title getItem
-// @Description gets an item given its id as url param
+// @Description gets an item given its id as url param, else, checks for page and sizes and returns a slice of size items
 // @Accept  json
-// @Param   item        	query   string        true        "item"
+// @Param   item        	query   string    false        "item"
 // @Success 200 {object} response.Response    response.Response
 // @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
 // @Failure 500 {object} response.Response    {Status: "Internal Server Error", error.Error()}
 // @Resource /item
 // @Router /item [get]
 func getItem(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
-	itemId := r.URL.Query().Get("item"); if len(itemId) == 0 {
-		return response.Response{}, "badRequest"
+	page := r.URL.Query().Get("page"); if len(page) == 0 {
+		itemId := r.URL.Query().Get("item"); if len(itemId) == 0 {
+			return response.Response{}, "badRequest"
+		}
+		item := service.GetItem(itemId, db)
+		if len(item.Item) == 0 || item.Item == ""  {
+			return response.Response{Status: "Not Found", Message: "Item not found"}, "badRequest"
+		}
+		return item, ""
+	} else {
+		size := r.URL.Query().Get("size"); if len(size) == 0 {
+			return response.Response{Status: "Not Found", Message: "Bad request"}, "badRequest"
+		}
+		p, pError := strconv.Atoi(page); if pError != nil {
+			return response.Response{Status: "Bad Request", Message: "Bad value for page"}, "badRequest"
+		}
+		s, sError := strconv.Atoi(size); if sError != nil {
+			return response.Response{Status: "Bad Request", Message: "Bad value for size"}, "badRequest"
+		}
+		items, itemsError := service.GetItems(p, s, db); if itemsError != nil {
+			return response.Response{Status: "Not Found", Message: itemsError.Error()}, "badRequest"
+		}
+		return items, ""
 	}
-	item := service.GetItem(itemId, db)
-	if len(item.Item) == 0 || item.Item == ""  {
-		return response.Response{Status: "Not Found", Message: "Item not found"}, "badRequest"
-	}
-	return item, ""
 }
 
 // @Title postItem

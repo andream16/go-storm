@@ -54,11 +54,11 @@ func createTables(db *sql.DB) {
 
 func defaultInserts(db *sql.DB) {
 	insertQueries := insert.INSERTS
-	for _, query := range insertQueries {
-		_, insertError := db.Exec(query); if insertError != nil {
-			fmt.Println(fmt.Sprintf("unable to insert row %s, error: %s", query, insertError))
+	for k := range insertQueries {
+		_, insertError := db.Exec(insertQueries[k]); if insertError != nil {
+			fmt.Println(fmt.Sprintf("unable to insert row %s, error: %s", insertQueries[k], insertError))
 		} else {
-			fmt.Println(fmt.Sprintf("inserted row %s", query))
+			fmt.Println(fmt.Sprintf("inserted row %s", insertQueries[k]))
 		}
 	}
 }
