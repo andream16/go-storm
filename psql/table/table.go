@@ -54,11 +54,12 @@ var CREATETABLES = map[string]string{
 		")",
 	"price":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Price"] + " (" +
-		"id smallint NOT NULL DEFAULT nextval('price_id_seq') PRIMARY KEY, " +
+		"id smallint NOT NULL DEFAULT nextval('price_id_seq'), " +
 		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"price numeric(10,2), " +
-		"date text, " +
-		"flag boolean DEFAULT false" +
+		"price numeric(10,2) NOT NULL, " +
+		"date text NOT NULL, " +
+		"flag boolean DEFAULT false, " +
+		"PRIMARY KEY (item,price,date)" +
 		")",
 	"review":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Review"] + " (" +
@@ -76,10 +77,11 @@ var CREATETABLES = map[string]string{
 		")",
 	"forecast":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Forecast"] + " (" +
-		"id smallint NOT NULL DEFAULT nextval('forecast_id_seq') PRIMARY KEY, " +
+		"id smallint NOT NULL DEFAULT nextval('forecast_id_seq'), " +
 		"name text, " +
 		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"price numeric(10,2), " +
-		"date text" +
+		"price numeric(10,2) NOT NULL, " +
+		"date text NOT NULL," +
+		"PRIMARY KEY (name,item,price,date)" +
 		")",
 }

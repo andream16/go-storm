@@ -6,7 +6,7 @@ import (
 	"github.com/andream16/go-storm/shared/handler/response"
 	"github.com/andream16/go-storm/shared/handler/functionmapper"
 	"github.com/andream16/go-storm/shared/handler/errortostatus"
-	"github.com/andream16/go-storm/api/item/service"
+	"github.com/andream16/go-storm/api/feature/item/service"
 	"encoding/json"
 	"github.com/andream16/go-storm/model/request"
 	"strconv"

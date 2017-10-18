@@ -8,7 +8,7 @@ import (
 	"github.com/andream16/go-storm/shared/handler/response"
 	"encoding/json"
 	"github.com/andream16/go-storm/model/request"
-	"github.com/andream16/go-storm/api/price/service"
+	"github.com/andream16/go-storm/api/feature/price/service"
 	"fmt"
 )
 
@@ -21,8 +21,8 @@ var itemHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) 
 
 func PriceHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		itemHandlersMap, ok := itemHandlers[r.Method]; if ok {
-			res, errorMessage := functionmapper.FunctionMapper(w, r, db, itemHandlersMap); if errorMessage != "" {
+		priceHandlersMap, ok := itemHandlers[r.Method]; if ok {
+			res, errorMessage := functionmapper.FunctionMapper(w, r, db, priceHandlersMap); if errorMessage != "" {
 				errortostatus.ErrorAsStringToStatus(errorMessage, w)
 			}
 			response.JsonResponse(res, w)
