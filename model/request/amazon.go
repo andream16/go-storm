@@ -6,7 +6,7 @@ type Amazon struct {
 	Item string `json:"item"`
 	Manufacturer string `json:"manufacturer"`
 	Review []Review
-	Category []Category
+	Category []AmazonCategory
 }
 
 type Review struct {
@@ -15,6 +15,6 @@ type Review struct {
 	Sentiment uint `json:"sentiment"`
 }
 
-type Category struct {
+type AmazonCategory struct {
 	Name string `json:"category"`
 }

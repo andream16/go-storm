@@ -1,6 +1,6 @@
 package table
 
-var ORDER = [8]string {
+var ORDER = [9]string {
 	"manufacturer",
 	"currency",
 	"trend",
@@ -9,6 +9,7 @@ var ORDER = [8]string {
 	"review",
 	"category",
 	"forecast",
+	"category_item",
 }
 
 var TABLES = map[string]string {
@@ -20,6 +21,7 @@ var TABLES = map[string]string {
 	"Review"       : "review",
 	"Category"     : "category",
 	"Forecast" 	   : "forecast",
+	"Category_Item": "category_item",
 }
 
 var CREATETABLES = map[string]string{
@@ -39,7 +41,7 @@ var CREATETABLES = map[string]string{
 		"id smallint NOT NULL DEFAULT nextval('trend_id_seq') PRIMARY KEY, " +
 		"manufacturer text REFERENCES " + TABLES["Manufacturer"] + "(name) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"date text, " +
-		"value numeric(10,2)" +
+		"value double precision NOT NULL" +
 		")",
 	"item":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Item"] + " (" +
@@ -72,8 +74,7 @@ var CREATETABLES = map[string]string{
 		")",
 	"category":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Category"] + " (" +
-		"name text PRIMARY KEY, " +
-		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE" +
+		"category text PRIMARY KEY" +
 		")",
 	"forecast":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Forecast"] + " (" +
@@ -83,5 +84,11 @@ var CREATETABLES = map[string]string{
 		"price double precision NOT NULL, " +
 		"date text NOT NULL," +
 		"PRIMARY KEY (name,item,price,date)" +
+		")",
+	"category_item":
+	"CREATE TABLE IF NOT EXISTS " + TABLES["Category_Item"] + " (" +
+		"item text REFERENCES item (item) ON UPDATE CASCADE ON DELETE CASCADE, " +
+		"category text REFERENCES category (category) ON UPDATE CASCADE ON DELETE CASCADE," +
+		"CONSTRAINT category_item_pk PRIMARY KEY (item, category)" +
 		")",
 }
