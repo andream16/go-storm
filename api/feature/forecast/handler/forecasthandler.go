@@ -33,24 +33,24 @@ func ForecastHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-	// @Title getForecast
-	// @Description gets all forecasts of an item given an itemId.
-	// @Accept  json
-	// @Param   item        	query   string    true        "item"
-	// @Success 200 {object} response.Response    response.Response
-	// @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
-	// @Failure 500 {object} response.Response    {Status: "Internal Server Error", error.Error()}
-	// @Resource /forecast
-	// @Router /forecast [get]
-	func getForecast(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
+// @Title getForecast
+// @Description gets all forecasts of an item given an itemId.
+// @Accept  json
+// @Param   item        	query   string    true        "item"
+// @Success 200 {object} response.Response    response.Response
+// @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
+// @Failure 500 {object} response.Response    {Status: "Internal Server Error", error.Error()}
+// @Resource /forecast
+// @Router /forecast [get]
+func getForecast(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
 	itemId := r.URL.Query().Get("item"); if len(itemId) == 0 {
-	return response.Response{Status: "Bad Request", Message: "No item id was passed."}, "badRequest"
+		return response.Response{Status: "Bad Request", Message: "No item id was passed."}, "badRequest"
 	}
 	forecasts, forecastsError := service.GetForecasts(itemId, db); if forecastsError != nil {
-	return response.Response{Status: "Internal Server Error", Message: forecastsError.Error()}, "serverError"
+		return response.Response{Status: "Internal Server Error", Message: forecastsError.Error()}, "serverError"
 	}
 	return forecasts, ""
-	}
+}
 
 // @Title postForecast
 // @Description add [](price, date) for a given item.
@@ -93,6 +93,7 @@ func putForecast(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{
 	}
 	return response.Response{Status: "Ok", Message: fmt.Sprintf("Successfully updated forecasts for item %s", forecasts.Item)}, ""
 }
+
 // @Title deleteForecast
 // @Description deletes all the forecasts for a given item
 // @Accept  json

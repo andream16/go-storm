@@ -58,7 +58,4 @@ var INSERTS = []string {
 	"INSERT INTO currency (name,date,value) VALUES ('DOLLAR','15-10-2017',54.56)",
 	"INSERT INTO currency (name,date,value) VALUES ('EURO','21-10-2017',84.56)",
 	"INSERT INTO currency (name,date,value) VALUES ('DOLLAR','15-10-2017',90.12)",
-
-
-
 }

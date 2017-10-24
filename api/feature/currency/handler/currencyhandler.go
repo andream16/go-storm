@@ -93,6 +93,7 @@ func putCurrency(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{
 	}
 	return response.Response{Status: "Ok", Message: fmt.Sprintf("Successfully updated currencies for currency %s", currencies.Name)}, ""
 }
+
 // @Title deleteCurrency
 // @Description deletes all the currencies for a given currency name
 // @Accept  json

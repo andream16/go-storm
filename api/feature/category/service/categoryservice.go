@@ -47,8 +47,8 @@ func GetCategoriesByItem(itemId string, db *sql.DB) ([]request.Category, error) 
 	return categories, nil
 }
 
-func AddCategoriesByItem(categories []request.Category, itemId string, db *sql.DB) error {
-	for category := range categories {
+func AddCategoriesByItem(categoriesByItem request.CategoryRequest, db *sql.DB) error {
+	for _, category := range categoriesByItem.Categories {
 		_, insertCategoriesError := db.Query(`INSERT INTO category(category)` +
 			` VALUES($1) ON CONFLICT (category) DO UPDATE SET` +
 			` category=$1`,
@@ -57,19 +57,24 @@ func AddCategoriesByItem(categories []request.Category, itemId string, db *sql.D
 			}
 		_, insertCategoriesItemsError := db.Query(`INSERT INTO category_item(category,item)` +
 			` VALUES($1,$2)`,
-			&category, &itemId); if insertCategoriesItemsError != nil {
+			&category, &categoriesByItem.Item); if insertCategoriesItemsError != nil {
 			return insertCategoriesItemsError
 		}
 	}
 	return nil
 }
 
-func ItemsByCategory(items []request.Item, category string, db *sql.DB) error {
-	for _, item := range items {
-		_, insertCategoriesItemsError := db.Query(`INSERT INTO category_item(category,item)` +
-			` VALUES($1,$2)`,
-			&category, &item.Item); if insertCategoriesItemsError != nil {
-			return insertCategoriesItemsError
+func EditCategory(categoriesByItem request.CategoryRequest, db *sql.DB) error  {
+	_, updateCategoriesError := db.Query(`DELETE FROM category_item WHERE item=$1`, &categoriesByItem.Item); if updateCategoriesError != nil {
+		return updateCategoriesError
+	}
+	return AddCategoriesByItem(categoriesByItem, db)
+}
+
+func DeleteCategory(categoriesByItem request.CategoryRequest, db *sql.DB) error  {
+	for _, category := range categoriesByItem.Categories {
+		_, deleteCategoriesError := db.Query(`DELETE FROM category_item WHERE item=$1 AND category=$2`, &categoriesByItem.Item, &category); if deleteCategoriesError != nil {
+			return deleteCategoriesError
 		}
 	}
 	return nil

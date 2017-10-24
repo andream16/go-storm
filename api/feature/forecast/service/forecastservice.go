@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"errors"
 )
+
 func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 	rows, queryError := db.Query(`SELECT price,date FROM forecast WHERE item=$1 ORDER BY date ASC`, itemId); if queryError != nil {
 		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecasts for item %s. Error: %s", itemId, queryError.Error()))
