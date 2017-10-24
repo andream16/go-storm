@@ -32,9 +32,10 @@ var CREATETABLES = map[string]string{
 		")",
 	"currency":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Currency"] + " (" +
-		"name text PRIMARY KEY, " +
-		"date text, " +
-		"value double precision NOT NULL" +
+		"name currency_name NOT NULL, " +
+		"date text NOT NULL, " +
+		"value double precision NOT NULL," +
+		"PRIMARY KEY (name,date,value)" +
 		")",
 	"trend":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Trend"] + " (" +
@@ -79,7 +80,7 @@ var CREATETABLES = map[string]string{
 	"forecast":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Forecast"] + " (" +
 		"id smallint NOT NULL DEFAULT nextval('forecast_id_seq'), " +
-		"name text, " +
+		"name forecast_name, " +
 		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"price double precision NOT NULL, " +
 		"date text NOT NULL," +

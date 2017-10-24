@@ -9,6 +9,7 @@ import (
 	"github.com/andream16/go-storm/psql/sequence"
 	"github.com/andream16/go-storm/psql/table"
 	"github.com/andream16/go-storm/psql/insert"
+	"github.com/andream16/go-storm/psql/enum"
 )
 
 // Initializes connection to Postgresql client and creates tables.
@@ -21,9 +22,11 @@ func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	}
 	fmt.Println("Successfully connected to Postgresql. Now creating sequences ...")
 	createSequences(db)
-	fmt.Println("Sequences done. Now creating tables . . .")
+	fmt.Println("Enum done. Now creating enum . . .")
+	createEnum(db)
+	fmt.Println("Enum done. Now creating tables . . .")
 	createTables(db)
-	fmt.Println("Tables done. Now inserting default rows . . .")
+	fmt.Println("Tables done. Now inserting default inserts . . .")
 	defaultInserts(db)
 	fmt.Println("Inserts done. Postgresql initialization done.")
 	return db, nil
@@ -59,6 +62,18 @@ func defaultInserts(db *sql.DB) {
 			fmt.Println(fmt.Sprintf("unable to insert row %s, error: %s", insertQueries[k], insertError))
 		} else {
 			fmt.Println(fmt.Sprintf("inserted row %s", insertQueries[k]))
+		}
+	}
+}
+
+func createEnum(db *sql.DB){
+
+	enums:= enum.ENUMERATIONS
+	for k := range enums {
+		_, insertError := db.Exec(enums[k]); if insertError != nil {
+			fmt.Println(fmt.Sprintf("unable to insert row %s, error: %s", enums[k], insertError))
+		} else {
+			fmt.Println(fmt.Sprintf("inserted row %s", enums[k]))
 		}
 	}
 }

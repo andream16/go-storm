@@ -44,4 +44,21 @@ var INSERTS = []string {
 	"INSERT INTO category_item(item,category) VALUES('test2','cat4')",
 	"INSERT INTO category_item(item,category) VALUES('test2','cat5')",
 	"INSERT INTO category_item(item,category) VALUES('test2','cat6')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('ATCR','test1',140.00,'10-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('ATCR','test1',40.00,'11-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('ATR','test3',10.00,'11-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('ATC','test4',30.00,'12-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('ATC','test4',140.00,'13-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('ACR','test2',140.00,'10-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('ACR','test2',40.54,'14-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('AT','test5',23.58,'17-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('AT','test5',52.45,'15-10-2017')",
+	"INSERT INTO forecast (name,item,price,date) VALUES ('AC','test6',70.00,'20-10-2017')",
+	"INSERT INTO currency (name,date,value) VALUES ('EURO','14-10-2017',34.56)",
+	"INSERT INTO currency (name,date,value) VALUES ('DOLLAR','15-10-2017',54.56)",
+	"INSERT INTO currency (name,date,value) VALUES ('EURO','21-10-2017',84.56)",
+	"INSERT INTO currency (name,date,value) VALUES ('DOLLAR','15-10-2017',90.12)",
+
+
+
 }
