@@ -101,8 +101,8 @@ func putCurrency(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{
 // @Success 200 {object} response.Response    response.Response
 // @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
 // @Failure 500 {object} response.Response    {Status: "Internal Server Error", error.Error()}
-// @Resource /forecast
-// @Router /forecast [delete]
+// @Resource /currency
+// @Router /currency [delete]
 func deleteCurrency(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
 	var currencies request.Currency
 	decodeCurrenciesErr := json.NewDecoder(r.Body).Decode(&currencies); if decodeCurrenciesErr != nil {

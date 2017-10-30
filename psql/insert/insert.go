@@ -12,6 +12,8 @@ var INSERTS = []string {
 	"INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews) VALUES('test8','no_manufacturer','www.google.com','gogigo.img','test','description',false)",
 	"INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews) VALUES('test9','no_manufacturer','www.google.com','gogigo.img','test','description',false)",
 	"INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews) VALUES('test10','no_manufacturer','www.google.com','gogigo.img','test','description',false)",
+	"INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews) VALUES('test11','Samsung','www.google.com','gogigo.img','test','description',false)",
+	"INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews) VALUES('test12','Samsung','www.google.com','gogigo.img','test','description',false)",
 	"INSERT INTO price(item,price,date) VALUES('test1',100.00,'10-10-2017')",
 	"INSERT INTO price(item,price,date) VALUES('test1',100.10,'11-10-2017')",
 	"INSERT INTO price(item,price,date) VALUES('test1',101.00,'12-10-2017')",
@@ -58,4 +60,7 @@ var INSERTS = []string {
 	"INSERT INTO currency (name,date,value) VALUES ('DOLLAR','15-10-2017',54.56)",
 	"INSERT INTO currency (name,date,value) VALUES ('EURO','21-10-2017',84.56)",
 	"INSERT INTO currency (name,date,value) VALUES ('DOLLAR','15-10-2017',90.12)",
+	"INSERT INTO manufacturer (name) VALUES ('Apple')",
+	"INSERT INTO manufacturer (name) VALUES ('Samsung')",
+	"INSERT INTO manufacturer (name) VALUES ('Sandisk')",
 }
