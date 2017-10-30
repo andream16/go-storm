@@ -63,4 +63,10 @@ var INSERTS = []string {
 	"INSERT INTO manufacturer (name) VALUES ('Apple')",
 	"INSERT INTO manufacturer (name) VALUES ('Samsung')",
 	"INSERT INTO manufacturer (name) VALUES ('Sandisk')",
+	"INSERT INTO manufacturer (name) VALUES ('Sandisk')",
+	"INSERT INTO review (item,content,sentiment,stars,date) VALUES ('test1','olioo che review',0,4,'2017-10-30')",
+	"INSERT INTO review (item,content,sentiment,stars,date) VALUES ('test1','olioo che reviewxxxx',0,4,'2017-11-30')",
+	"INSERT INTO review (item,content,sentiment,stars,date) VALUES ('test10','olioo gogigo',0,4,'2017-10-30')",
+
+
 }

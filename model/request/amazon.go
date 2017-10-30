@@ -1,20 +1,25 @@
 package request
 
-import "time"
 
 type Amazon struct {
-	Item string `json:"item"`
-	Manufacturer string `json:"manufacturer"`
+	Item string `json:"item,omitempty"`
+	Manufacturer string `json:"manufacturer,omitempty"`
 	Review []Review
 	Category []AmazonCategory
 }
 
+type ReviewEntry struct {
+	Date string `json:"date,omitempty"`
+	Content string `json:"content,omitempty"`
+	Sentiment uint `json:"sentiment,omitempty"`
+	Stars uint `json:"stars,omitempty"`
+}
+
 type Review struct {
-	Date time.Time `json:"date"`
-	Text string `json:"text"`
-	Sentiment uint `json:"sentiment"`
+	Item string `json:"item,omitempty"`
+	Review []ReviewEntry `json:"review"`
 }
 
 type AmazonCategory struct {
-	Name string `json:"category"`
+	Name string `json:"category,omitempty"`
 }

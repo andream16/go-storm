@@ -1,13 +1,12 @@
 package request
 
-import "time"
 
 type Trend struct {
-	Manufacturer string `json:"manufacturer"`
+	Manufacturer string `json:"manufacturer,omitempty"`
 	Trend []TrendEntry
 }
 
 type TrendEntry struct {
-	Date time.Time `json:"date"`
-	Value float64 `json:"value"`
+	Date string `json:"date,omitempty"`
+	Value float64 `json:"value,omitempty"`
 }
