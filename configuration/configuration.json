@@ -1,7 +1,7 @@
 {
   "ENVIRONMENT" : "Development",
   "SERVER" : {
-    "HOST" : "localhost",
+    "HOST" : "db",
     "PORT" : 8080
   },
   "DATABASE" : {

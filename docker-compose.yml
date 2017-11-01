@@ -13,7 +13,7 @@ services:
     volumes:
       - .:/go/src/github.com/andream16/go-storm
     ports:
-      - "4200:8080"
+      - "8080:8080"
     depends_on:
       - db
     links:
