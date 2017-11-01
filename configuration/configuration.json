@@ -1,7 +1,7 @@
 {
+  "ENVIRONMENT" : "Development",
   "SERVER" : {
     "HOST" : "localhost",
-    "API"  : "http://www.vocalware.com/tts/gen.php",
     "PORT" : 8080
   },
   "DATABASE" : {

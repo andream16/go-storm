@@ -14,9 +14,9 @@ import (
 
 // Initializes connection to Postgresql client and creates tables.
 func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
-	fmt.Println(fmt.Sprintf("Connecting to Postgresql with credentials: user=%s dbname=%s sslmode=%s ...", conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE))
-	db, dbErr := sql.Open(conf.Database.DRIVERNAME, fmt.Sprintf("user=%s dbname=%s sslmode=%s",
-				        conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE)); if dbErr != nil {
+	connString := fmt.Sprintf("postgres://%s@localhost/%s?sslmode=%s", conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE)
+	fmt.Println(fmt.Sprintf("Connecting to Postgresql with credentials: user=%s dbname=%s sslmode=%s using connection string = %s", conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE, connString))
+	db, dbErr := sql.Open(conf.Database.DRIVERNAME, connString); if dbErr != nil {
 		fmt.Println("Unable to connect to Postgresql, got error: ", errors.New(dbErr))
 		return db, dbErr
 	}
@@ -26,9 +26,12 @@ func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	createEnum(db)
 	fmt.Println("Enum done. Now creating tables . . .")
 	createTables(db)
-	fmt.Println("Tables done. Now inserting default inserts . . .")
-	defaultInserts(db)
-	fmt.Println("Inserts done. Postgresql initialization done.")
+	fmt.Println("Tables done.")
+	if (conf.Environment == "Development") {
+		fmt.Println("Now inserting default inserts . . .")
+		defaultInserts(db)
+		fmt.Println("Inserts done. Postgresql initialization done.")
+	}
 	return db, nil
 }
 

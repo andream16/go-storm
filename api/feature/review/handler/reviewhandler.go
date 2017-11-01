@@ -55,7 +55,7 @@ func getReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{},
 // @Title postReview
 // @Description adds n review entries given a item.
 // @Accept  json
-// @Param   review        	query  request.review    true        "review"
+// @Param   review       query  request.Review    true        "review"
 // @Success 200 {object} response.Response    response.Response
 // @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
 // @Failure 500 {object} response.Response    {Status: "Internal Server Error", error.Error()}
@@ -73,7 +73,7 @@ func postReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}
 }
 
 // @Title putReview
-// @Description edits n trend entries given a manufacturer.
+// @Description edits n review entries given an item.
 // @Accept  json
 // @Param   review        	query  request.Review    true        "review"
 // @Success 200 {object} response.Response    response.Response
@@ -93,7 +93,7 @@ func putReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{},
 }
 
 // @Title deleteReview
-// @Description deletes n trend entries given a manufacturer.
+// @Description deletes n review entries given an item.
 // @Accept  json
 // @Param   review        	query  request.Review    true        "review"
 // @Success 200 {object} response.Response    response.Response

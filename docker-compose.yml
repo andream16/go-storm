@@ -1,0 +1,20 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: priceprobe
+      POSTGRES_USER: postgres
+    ports:
+      - 5432:5432
+  app:
+    build: .
+    command: ["./wait-for-it.sh", "db:5432", "--", "go", "run", "server.go"]
+    volumes:
+      - .:/go/src/github.com/andream16/go-storm
+    ports:
+      - "4200:8080"
+    depends_on:
+      - db
+    links:
+      - db

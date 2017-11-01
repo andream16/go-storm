@@ -10,10 +10,10 @@ import (
 )
 
 type Configuration struct {
+	Environment string `json:"ENVIRONMENT"`
 	Server struct {
 		Host	string	`json:"HOST"`
 		Port	int   	`json:"PORT"`
-		Api		string  `json:"API"`
 	} `json:"SERVER"`
 	Database struct {
 		DRIVERNAME	string	`json:"DRIVERNAME"`
