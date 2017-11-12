@@ -12,5 +12,4 @@ Golang PSQL ORM for Price Probe.
  - Run with no output `docker-compose up -d`
  - Stop with `docker-compose down`
  - Stop and remove images with `docker-compose down --rmi all`
- - Open Shell on one container with `docker exec -i -t container_id /bin/bash
-`
+ - Open Shell on one container with `docker exec -i -t container_id /bin/bash`
