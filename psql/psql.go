@@ -27,11 +27,13 @@ func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	fmt.Println("Enum done. Now creating tables . . .")
 	createTables(db)
 	fmt.Println("Tables done.")
-	if (conf.Environment == "Development") {
-		fmt.Println("Now inserting default inserts . . .")
-		defaultInserts(db)
-		fmt.Println("Inserts done. Postgresql initialization done.")
+	insertType := insert.DEV_INSERTS
+	if (conf.Environment == "Production") {
+		insertType = insert.PROD_INSERTS
 	}
+	fmt.Println("Now inserting default inserts . . .")
+	defaultInserts(db, insertType)
+	fmt.Println("Inserts done. Postgresql initialization done.")
 	return db, nil
 }
 
@@ -58,8 +60,7 @@ func createTables(db *sql.DB) {
 	}
 }
 
-func defaultInserts(db *sql.DB) {
-	insertQueries := insert.INSERTS
+func defaultInserts(db *sql.DB, insertQueries []string) {
 	for k := range insertQueries {
 		_, insertError := db.Exec(insertQueries[k]); if insertError != nil {
 			fmt.Println(fmt.Sprintf("unable to insert row %s, error: %s", insertQueries[k], insertError))
@@ -70,7 +71,6 @@ func defaultInserts(db *sql.DB) {
 }
 
 func createEnum(db *sql.DB){
-
 	enums:= enum.ENUMERATIONS
 	for k := range enums {
 		_, insertError := db.Exec(enums[k]); if insertError != nil {
