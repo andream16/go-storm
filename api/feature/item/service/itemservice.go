@@ -20,7 +20,7 @@ func GetItems(page, size int, db *sql.DB) ([]request.Item, error) {
 	if page == 1 {
 		start = 1; end = size
 	} else {
-		start = size; end = page * size
+		start = ((page -1) * size) + 1; end = page * size
 	}
 	rows, queryError := db.Query(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE id BETWEEN $1 AND $2`, start, end); if queryError != nil {
 		return []request.Item{}, errors.New(fmt.Sprintf("Unable to get items for page %v and size %v. Error: %s", page, size, queryError.Error()))
