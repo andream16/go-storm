@@ -47,5 +47,5 @@ func postAmazon(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}
 	addAmazonError := service.AddAmazonEntry(amazonEntry, db); if addAmazonError != nil {
 		return response.Response{Status: "Bad Request", Message: addAmazonError.Error()}, "serverError"
 	}
-	return response.Response{Status: "Ok", Message: fmt.Sprintf("Successfully added amazon entry for item %s.", amazonEntry.Item)}, ""
+	return response.Response{Status: "Ok", Message: fmt.Sprintf("Successfully added amazon entry for item %s.", amazonEntry.Item.Item)}, ""
 }

@@ -3,7 +3,7 @@ package psql
 import (
 	"fmt"
 	"database/sql"
-	//"github.com/lib/pq"
+	_ "github.com/lib/pq"
 	"github.com/go-errors/errors"
 	"github.com/andream16/go-storm/configuration"
 	"github.com/andream16/go-storm/psql/sequence"
