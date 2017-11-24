@@ -63,6 +63,16 @@ func EditItem(item request.Item, db *sql.DB) error {
 	return nil
 }
 
+func PatchManufacturer(item request.Item, db *sql.DB) error {
+	_, updateError := db.Query(`UPDATE item SET` +
+		` manufacturer=$1 WHERE item=$2`,
+		&item.Manufacturer, &item.Item)
+	if updateError != nil {
+		return updateError
+	}
+	return nil
+}
+
 func DeleteItem(itemId string, db *sql.DB) error {
 	_, deleteError := db.Query(`DELETE FROM item WHERE item=$1`, itemId); if deleteError != nil {
 		return deleteError

@@ -44,10 +44,9 @@ func GetManufacturerByItem(itemId string, db *sql.DB) (request.Manufacturer, err
 }
 
 func AddManufacturer(manufacturer request.Manufacturer, db *sql.DB) error {
-
 	_, insertManufacturerError := db.Query(`INSERT INTO manufacturer(name)` +
 			` VALUES($1)`,
-			&manufacturer.Name,); if insertManufacturerError != nil {
+			&manufacturer.Name); if insertManufacturerError != nil {
 			return insertManufacturerError
 		}
 

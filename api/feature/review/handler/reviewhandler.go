@@ -63,7 +63,7 @@ func getReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{},
 // @Router /review [post]
 func postReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
 	var review request.Review
-	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Review) == 0  {
+	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Reviews) == 0  {
 		return response.Response{Status: "Bad Request", Message: "Bad body"}, "badRequest"
 	}
 	addReviewError := service.AddReview(review, db); if addReviewError != nil {
@@ -83,7 +83,7 @@ func postReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}
 // @Router /review [put]
 func putReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
 	var review request.Review
-	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Review) == 0  {
+	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Reviews) == 0  {
 		return response.Response{Status: "Bad Request", Message: "Bad body"}, "badRequest"
 	}
 	addReviewError := service.EditReviewByItem(review, db); if addReviewError != nil {
@@ -103,7 +103,7 @@ func putReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{},
 // @Router /review [delete]
 func deleteReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
 	var review request.Review
-	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Review) == 0  {
+	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Reviews) == 0  {
 		return response.Response{Status: "Bad Request", Message: "Bad body"}, "badRequest"
 	}
 	deleteReviewError := service.DeleteReviewByItem(review, db); if deleteReviewError != nil {
