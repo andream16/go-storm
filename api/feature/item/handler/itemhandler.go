@@ -64,7 +64,7 @@ func getItem(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, s
 		items, itemsError := service.GetItems(p, s, db); if itemsError != nil {
 			return response.Response{Status: "Not Found", Message: itemsError.Error()}, "badRequest"
 		}
-		return items, ""
+		return request.Items{items}, ""
 	}
 }
 

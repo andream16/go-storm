@@ -48,10 +48,10 @@ var CREATETABLES = map[string]string{
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Item"] + " (" +
 		"item text PRIMARY KEY, " +
 		"manufacturer text REFERENCES " + TABLES["Manufacturer"] + "(name) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"url text, " +
-		"image text, " +
-		"title text, " +
-		"description text, " +
+		"url text DEFAULT '', " +
+		"image text DEFAULT '', " +
+		"title text DEFAULT '', " +
+		"description text DEFAULT '', " +
 		"id smallint NOT NULL DEFAULT nextval('item_id_seq'), " +
 		"has_reviews boolean DEFAULT false" +
 		")",

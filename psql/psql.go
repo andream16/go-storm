@@ -15,9 +15,9 @@ import (
 // Initializes connection to Postgresql client and creates tables.
 func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	host := conf.Server.Host
-	if (conf.Environment == "Production") {
+	/*if (conf.Environment == "Production") {
 		host = "db"
-	}
+	}*/
 	connString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s", host, conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE)
 	fmt.Println(fmt.Sprintf("Connecting to Postgresql with credentials: user=%s dbname=%s sslmode=%s using connection string = %s", conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE, connString))
 	db, dbErr := sql.Open(conf.Database.DRIVERNAME, connString); if dbErr != nil {

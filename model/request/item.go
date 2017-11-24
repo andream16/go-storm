@@ -9,3 +9,7 @@ type Item struct {
 	Title string `json:"title,omitempty"`
 	Description string `json:"description,omitempty"`
 }
+
+type Items struct {
+	Items []Item `json:"items"`
+}
