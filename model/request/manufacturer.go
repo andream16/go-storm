@@ -5,6 +5,5 @@ type Manufacturer struct{
 }
 
 type ManufacturerRequest struct {
-	Item string `json:"item,omitempty"`
 	Manufacturer string `json:"manufacturer,omitempty"`
 }

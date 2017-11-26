@@ -3,7 +3,7 @@ package request
 
 type Amazon struct {
 	Item Item `json:"item"`
-	Manufacturer Manufacturer `json:"manufacturer"`
+	Manufacturer ManufacturerRequest `json:"manufacturer"`
 	Review Review `json:"review"`
-	Category CategoryRequest `json:"category"`
+	Category CategoryRequest `json:"categories"`
 }

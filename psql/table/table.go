@@ -47,7 +47,7 @@ var CREATETABLES = map[string]string{
 	"item":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Item"] + " (" +
 		"item text PRIMARY KEY, " +
-		"manufacturer text REFERENCES " + TABLES["Manufacturer"] + "(name) ON DELETE CASCADE ON UPDATE CASCADE, " +
+		"manufacturer text REFERENCES " + TABLES["Manufacturer"] + "(name) ON DELETE CASCADE ON UPDATE CASCADE DEFAULT 'no_manufacturer', " +
 		"url text DEFAULT '', " +
 		"image text DEFAULT '', " +
 		"title text DEFAULT '', " +

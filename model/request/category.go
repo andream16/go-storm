@@ -7,5 +7,5 @@ type Category struct {
 
 type CategoryRequest struct {
 	Item string `json:"item,omitempty"`
-	Categories []Category `json:"categories,omitempty"`
+	Categories []string `json:"categories,omitempty"`
 }

@@ -14,8 +14,8 @@ func AddAmazonEntry(amazonEntry request.Amazon, db *sql.DB) error {
 	var item = amazonEntry.Item
 	var category = amazonEntry.Category
 	var review = amazonEntry.Review
-	if len(manufacturer.Name) > 0 {
-		manufacturerService.AddManufacturer(manufacturer, db)
+	if len(manufacturer.Manufacturer) > 0 {
+		manufacturerService.AddManufacturer(request.Manufacturer{manufacturer.Manufacturer}, db)
 	}
 	if len(item.Item) > 0 {
 		itemService.PatchManufacturer(item, db)

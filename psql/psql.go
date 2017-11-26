@@ -15,7 +15,7 @@ import (
 // Initializes connection to Postgresql client and creates tables.
 func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	host := conf.Server.Host
-	/*if (conf.Environment == "Production") {
+	/*if conf.Environment == "Production" {
 		host = "db"
 	}*/
 	connString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s", host, conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE)
@@ -32,7 +32,7 @@ func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	createTables(db)
 	fmt.Println("Tables done.")
 	insertType := insert.DEV_INSERTS
-	if (conf.Environment == "Production") {
+	if conf.Environment == "Production" {
 		insertType = insert.PROD_INSERTS
 	}
 	fmt.Println("Now inserting default inserts . . .")

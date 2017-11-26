@@ -52,12 +52,12 @@ func AddCategoriesByItem(categoriesByItem request.CategoryRequest, db *sql.DB) e
 		_, insertCategoriesError := db.Query(`INSERT INTO category(category)` +
 			` VALUES($1) ON CONFLICT (category) DO UPDATE SET` +
 			` category=$1`,
-			&category.Category); if insertCategoriesError != nil {
+			&category); if insertCategoriesError != nil {
 				return insertCategoriesError
 			}
 		_, insertCategoriesItemsError := db.Query(`INSERT INTO category_item(category,item)` +
 			` VALUES($1,$2)`,
-			&category.Category, &categoriesByItem.Item); if insertCategoriesItemsError != nil {
+			&category, &categoriesByItem.Item); if insertCategoriesItemsError != nil {
 			return insertCategoriesItemsError
 		}
 	}
