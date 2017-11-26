@@ -43,6 +43,33 @@ func GetManufacturerByItem(itemId string, db *sql.DB) (request.Manufacturer, err
 	return manufacturer, nil
 }
 
+func GetManufacturers(page, size int, db *sql.DB) ([]request.Manufacturer, error) {
+	var manufacturers []request.Manufacturer
+	var start, end int
+	if page == 1 {
+		start = 1; end = size
+	} else {
+		start = ((page -1) * size) + 1; end = page * size
+	}
+	rows, queryError := db.Query(`SELECT distinct name FROM manufacturer WHERE id BETWEEN $1 AND $2`, start, end); if queryError != nil {
+		return []request.Manufacturer{}, errors.New(fmt.Sprintf("Unable to get items for page %v and size %v. Error: %s", page, size, queryError.Error()))
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var manufacturer request.Manufacturer
+		rowError := rows.Scan(&manufacturer.Name)
+		if rowError != nil {
+			return []request.Manufacturer{}, errors.New(fmt.Sprintf("Unable to unmarshal manufacturers for page %v and size %v. Error: %s", page, size, rowError.Error()))
+		}
+		manufacturers = append(manufacturers, manufacturer)
+	}; iterationError := rows.Err(); if iterationError != nil {
+		return []request.Manufacturer{}, errors.New(fmt.Sprintf("No manufacturers found for page %v and size %v. Error: %s", page, size, iterationError.Error()))
+	}; if len(manufacturers) == 0 {
+		return []request.Manufacturer{}, errors.New(fmt.Sprintf("No manufacturers found for page %v and size %v", page, size))
+	}
+	return manufacturers, nil
+}
+
 func AddManufacturer(manufacturer request.Manufacturer, db *sql.DB) error {
 	_, insertManufacturerError := db.Query(`INSERT INTO manufacturer(name)` +
 			` VALUES($1)`,

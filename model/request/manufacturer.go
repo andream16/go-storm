@@ -7,3 +7,7 @@ type Manufacturer struct{
 type ManufacturerRequest struct {
 	Manufacturer string `json:"manufacturer,omitempty"`
 }
+
+type Manufacturers struct {
+	Manufacturers []Manufacturer `json:"manufacturers"`
+}

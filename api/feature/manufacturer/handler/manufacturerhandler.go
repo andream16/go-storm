@@ -10,6 +10,7 @@ import (
 	"github.com/andream16/go-storm/model/request"
 	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
 var manufacturerHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) (interface{}, string) {
@@ -32,7 +33,7 @@ func ManufacturerHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request
 }
 
 // @Title getManufacturer
-// @Description gets manufacturer given an itemId
+// @Description gets manufacturer given an itemId, else, checks for page and sizes and returns a slice of size manufacturers
 // @Accept  json
 // @Param   item        	query   string	      true        "item"
 // @Success 200 {object} response.Response    response.Response
@@ -41,19 +42,40 @@ func ManufacturerHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request
 // @Resource /item
 // @Router /manufacturer [get]
 func getManufacturer(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
-	itemId := r.URL.Query().Get("item"); if len(itemId) == 0 {
-		manufacturer := r.URL.Query().Get("manufacturer"); if len(manufacturer) == 0 {
-			return response.Response{Status: "Bad Request", Message: "Bad request, no manufacturer or item found."}, "badRequest"
+		page := r.URL.Query().Get("page"); if len(page) == 0 {
+		itemId := r.URL.Query().Get("item");
+		if len(itemId) == 0 {
+			manufacturer := r.URL.Query().Get("manufacturer");
+			if len(manufacturer) == 0 {
+				return response.Response{Status: "Bad Request", Message: "Bad request, no manufacturer or item found."}, "badRequest"
+			}
+			items, itemsError := service.GetItemsByManufacturer(manufacturer, db);
+			if itemsError != nil {
+				return response.Response{Status: "Internal Server Error", Message: itemsError.Error()}, "serverError"
+			}
+			return items, ""
 		}
-		items, itemsError := service.GetItemsByManufacturer(manufacturer, db); if itemsError != nil {
-			return response.Response{Status: "Internal Server Error", Message: itemsError.Error()}, "serverError"
+		manufacturer, manufacturerError := service.GetManufacturerByItem(itemId, db);
+		if manufacturerError != nil {
+			return response.Response{Status: "Internal Server Error", Message: manufacturerError.Error()}, "serverError"
 		}
-		return items, ""
+		return manufacturer, ""
+	} else {
+		size := r.URL.Query().Get("size"); if len(size) == 0 {
+			return response.Response{Status: "Not Found", Message: "Bad request"}, "badRequest"
+		}
+		p, pError := strconv.Atoi(page); if pError != nil {
+			return response.Response{Status: "Bad Request", Message: "Bad value for page"}, "badRequest"
+		}
+		s, sError := strconv.Atoi(size); if sError != nil {
+			return response.Response{Status: "Bad Request", Message: "Bad value for size"}, "badRequest"
+		}
+		manufacturers, manufacturersError := service.GetManufacturers(p, s, db); if manufacturersError != nil {
+			return response.Response{Status: "Not Found", Message: manufacturersError.Error()}, "badRequest"
+		}
+		return request.Manufacturers{manufacturers}, ""
 	}
-	manufacturer, manufacturerError := service.GetManufacturerByItem(itemId, db); if manufacturerError != nil {
-		return response.Response{Status: "Internal Server Error", Message: manufacturerError.Error()}, "serverError"
-	}
-	return manufacturer, ""
+
 }
 
 // @Title postManufacturer
