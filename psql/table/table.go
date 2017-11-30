@@ -39,10 +39,10 @@ var CREATETABLES = map[string]string{
 		")",
 	"trend":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Trend"] + " (" +
-		"id smallint NOT NULL DEFAULT nextval('trend_id_seq') PRIMARY KEY, " +
 		"manufacturer text REFERENCES " + TABLES["Manufacturer"] + "(name) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"date text, " +
-		"value double precision NOT NULL" +
+		"value double precision NOT NULL, " +
+		"PRIMARY KEY(manufacturer, date, value)" +
 		")",
 	"item":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Item"] + " (" +

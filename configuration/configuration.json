@@ -1,5 +1,5 @@
 {
-  "ENVIRONMENT" : "Production",
+  "ENVIRONMENT" : "Development",
   "SERVER" : {
     "HOST" : "localhost",
     "PORT" : 8080
