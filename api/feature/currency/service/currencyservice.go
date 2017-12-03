@@ -8,7 +8,12 @@ import (
 )
 
 func GetCurrencyByName(name string, db *sql.DB) (request.Currency, error) {
-	rows, queryError := db.Query(`SELECT name,date,value FROM currency WHERE name=$1 ORDER BY date DESC`, name); if queryError != nil {
+	stmt, err := db.Prepare(`SELECT name,date,value FROM currency WHERE name=$1 ORDER BY date DESC`); if err != nil {
+		defer stmt.Close()
+		return request.Currency{}, err
+	}
+	defer stmt.Close()
+	rows, queryError := stmt.Query(name); if queryError != nil {
 		return request.Currency{}, errors.New(fmt.Sprintf("Unable to get date,values for currency %s. Error: %s", name, queryError.Error()))
 	}
 	defer rows.Close()
@@ -28,10 +33,14 @@ func GetCurrencyByName(name string, db *sql.DB) (request.Currency, error) {
 }
 
 func AddCurrencies(currencies request.Currency, db *sql.DB) error {
+	stmt, err := db.Prepare(`INSERT INTO currency(name,date,value) VALUES ($1,$2,$3)`); if err != nil {
+		defer stmt.Close()
+		return err
+	}
+	defer stmt.Close()
 	name := currencies.Name
 	for _, currency := range currencies.Trend {
-		_, insertError := db.Query(`INSERT INTO currency(name,date,value) VALUES ($1,$2,$3)`, name, currency.Date,currency.Value)
-		if insertError != nil {
+		_, insertError := stmt.Exec(name, currency.Date,currency.Value); if insertError != nil {
 			return insertError
 		}
 	}
@@ -40,11 +49,16 @@ func AddCurrencies(currencies request.Currency, db *sql.DB) error {
 
 func EditCurrency(currencies request.Currency, db *sql.DB) error {
 	name := currencies.Name
-	_, deleteError := db.Query(`DELETE FROM currency WHERE name=$1`, name); if deleteError != nil {
+	stmtInsert, err := db.Prepare(`INSERT INTO currency(name,date,value) VALUES ($1,$2,$3)`); if err != nil {
+		defer stmtInsert.Close()
+		return err
+	}
+	defer stmtInsert.Close()
+	deleteError := DeleteCurrency(name, db); if deleteError != nil {
 		return deleteError
 	}
 	for _, currency := range currencies.Trend {
-		_, insertError := db.Query(`INSERT INTO currency(name,date,value) VALUES ($1,$2,$3)`, name, currency.Date,currency.Value)
+		_, insertError := stmtInsert.Exec(name, currency.Date,currency.Value)
 		if insertError != nil {
 			return insertError
 		}
@@ -53,7 +67,12 @@ func EditCurrency(currencies request.Currency, db *sql.DB) error {
 }
 
 func DeleteCurrency(name string, db *sql.DB) error {
-	_, deleteError := db.Query(`DELETE FROM currency WHERE name=$1`, name); if deleteError != nil {
+	stmtDelete, err := db.Prepare(`DELETE FROM currency WHERE name=$1`); if err != nil {
+		defer stmtDelete.Close()
+		return err
+	}
+	defer stmtDelete.Close()
+	_, deleteError := stmtDelete.Exec(name); if deleteError != nil {
 		return deleteError
 	}
 	return nil

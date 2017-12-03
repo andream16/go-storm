@@ -9,20 +9,30 @@ import (
 
 func GetItem(itemId string, db *sql.DB) request.Item {
 	var item request.Item
-	db.QueryRow(`SELECT * FROM item WHERE item=$1`, itemId).
-		Scan(&item.Item, &item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews)
+	stmt, err := db.Prepare(`SELECT * FROM item WHERE item=$1`); if err != nil {
+		return request.Item{}
+	}
+	defer stmt.Close()
+	selectError := stmt.QueryRow(itemId).Scan(&item.Item, &item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews)
+	if selectError != nil {
+		return request.Item{}
+	}
 	return item
 }
 
 func GetItems(page, size int, db *sql.DB) ([]request.Item, error) {
 	var items []request.Item
 	var start, end int
+	stmt, err := db.Prepare(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE id BETWEEN $1 AND $2`); if err != nil {
+		return []request.Item{}, err
+	}
+	defer stmt.Close()
 	if page == 1 {
 		start = 1; end = size
 	} else {
 		start = ((page -1) * size) + 1; end = page * size
 	}
-	rows, queryError := db.Query(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE id BETWEEN $1 AND $2`, start, end); if queryError != nil {
+	rows, queryError := stmt.Query(start, end); if queryError != nil {
 		return []request.Item{}, errors.New(fmt.Sprintf("Unable to get items for page %v and size %v. Error: %s", page, size, queryError.Error()))
 	}
 	defer rows.Close()
@@ -42,10 +52,11 @@ func GetItems(page, size int, db *sql.DB) ([]request.Item, error) {
 }
 
 func AddItem(item request.Item, db *sql.DB) error {
-	_, insertError := db.Query(`INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews)` +
-										  ` VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (item) DO UPDATE SET` +
-										  ` manufacturer=$2, url=$3, image=$4, title=$5, description=$6, has_reviews=$7`,
-		&item.Item, &item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews)
+	stmt, err := db.Prepare(`INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT (item) DO UPDATE SET manufacturer=$2, url=$3, image=$4, title=$5, description=$6, has_reviews=$7`); if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, insertError := stmt.Exec(&item.Item, &item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews)
 	if insertError != nil {
 		return insertError
 	}
@@ -53,20 +64,11 @@ func AddItem(item request.Item, db *sql.DB) error {
 }
 
 func EditItem(item request.Item, db *sql.DB) error {
-	_, updateError := db.Query(`UPDATE item SET` +
-										` manufacturer=$1, url=$2, image=$3, title=$4, description=$5, has_reviews=$6` +
-	                                    ` WHERE item = $7`,
-		&item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews, &item.Item)
-	if updateError != nil {
-		return updateError
+	stmt, err := db.Prepare(`UPDATE item SET manufacturer=$1, url=$2, image=$3, title=$4, description=$5, has_reviews=$6 WHERE item = $7`); if err != nil {
+		return err
 	}
-	return nil
-}
-
-func PatchManufacturer(item request.Item, db *sql.DB) error {
-	_, updateError := db.Query(`UPDATE item SET` +
-		` manufacturer=$1 WHERE item=$2`,
-		&item.Manufacturer, &item.Item)
+	defer stmt.Close()
+	_, updateError := stmt.Exec(&item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews, &item.Item)
 	if updateError != nil {
 		return updateError
 	}
@@ -74,7 +76,12 @@ func PatchManufacturer(item request.Item, db *sql.DB) error {
 }
 
 func DeleteItem(itemId string, db *sql.DB) error {
-	_, deleteError := db.Query(`DELETE FROM item WHERE item=$1`, itemId); if deleteError != nil {
+	stmt, err := db.Prepare(`DELETE FROM item WHERE item=$1`); if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, deleteError := stmt.Exec(itemId)
+	if deleteError != nil {
 		return deleteError
 	}
 	return nil

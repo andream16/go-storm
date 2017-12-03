@@ -8,7 +8,12 @@ import (
 )
 
 func GetItemsByCategory(category string, db *sql.DB) ([]request.Item, error) {
-	rows, queryError := db.Query(`SELECT item FROM category_item WHERE category=$1 ORDER BY item ASC`, category); if queryError != nil {
+	stmt, err := db.Prepare(`SELECT item FROM category_item WHERE category=$1 ORDER BY item ASC`); if err != nil {
+		defer stmt.Close()
+		return []request.Item{}, err
+	}
+	defer stmt.Close()
+	rows, queryError := stmt.Query(category); if queryError != nil {
 		return []request.Item{}, errors.New(fmt.Sprintf("Unable to get item for category %s. Error: %s", category, queryError.Error()))
 	}
 	defer rows.Close()
@@ -28,7 +33,12 @@ func GetItemsByCategory(category string, db *sql.DB) ([]request.Item, error) {
 }
 
 func GetCategoriesByItem(itemId string, db *sql.DB) ([]request.Category, error) {
-	rows, queryError := db.Query(`SELECT category FROM category_item WHERE item=$1 ORDER BY category ASC`, itemId); if queryError != nil {
+	stmt, err := db.Prepare(`SELECT category FROM category_item WHERE item=$1 ORDER BY category ASC`); if err != nil {
+		defer stmt.Close()
+		return []request.Category{}, err
+	}
+	defer stmt.Close()
+	rows, queryError := stmt.Query(itemId); if queryError != nil {
 		return []request.Category{}, errors.New(fmt.Sprintf("Unable to get categories for item %s. Error: %s", itemId, queryError.Error()))
 	}
 	defer rows.Close()
@@ -48,16 +58,21 @@ func GetCategoriesByItem(itemId string, db *sql.DB) ([]request.Category, error) 
 }
 
 func AddCategoriesByItem(categoriesByItem request.CategoryRequest, db *sql.DB) error {
+	stmtCategory, err := db.Prepare(`INSERT INTO category(category) VALUES($1) ON CONFLICT (category) DO UPDATE SET category=$1`); if err != nil {
+		defer stmtCategory.Close()
+		return err
+	}
+	defer stmtCategory.Close()
+	stmtCategoryItems, err := db.Prepare(`INSERT INTO category_item(category,item) VALUES($1,$2)`); if err != nil {
+		defer stmtCategoryItems.Close()
+		return err
+	}
+	defer stmtCategoryItems.Close()
 	for _, category := range categoriesByItem.Categories {
-		_, insertCategoriesError := db.Query(`INSERT INTO category(category)` +
-			` VALUES($1) ON CONFLICT (category) DO UPDATE SET` +
-			` category=$1`,
-			&category); if insertCategoriesError != nil {
-				return insertCategoriesError
-			}
-		_, insertCategoriesItemsError := db.Query(`INSERT INTO category_item(category,item)` +
-			` VALUES($1,$2)`,
-			&category, &categoriesByItem.Item); if insertCategoriesItemsError != nil {
+	_, insertCategoriesError := stmtCategory.Exec(&category); if insertCategoriesError != nil {
+			return insertCategoriesError
+		}
+	_, insertCategoriesItemsError := stmtCategoryItems.Exec(&category, &categoriesByItem.Item); if insertCategoriesItemsError != nil {
 			return insertCategoriesItemsError
 		}
 	}
@@ -65,15 +80,25 @@ func AddCategoriesByItem(categoriesByItem request.CategoryRequest, db *sql.DB) e
 }
 
 func EditCategory(categoriesByItem request.CategoryRequest, db *sql.DB) error  {
-	_, updateCategoriesError := db.Query(`DELETE FROM category_item WHERE item=$1`, &categoriesByItem.Item); if updateCategoriesError != nil {
+	stmt, err := db.Prepare(`DELETE FROM category_item WHERE item=$1`); if err != nil {
+		defer stmt.Close()
+		return err
+	}
+	defer stmt.Close()
+	_, updateCategoriesError := stmt.Exec(&categoriesByItem.Item); if updateCategoriesError != nil {
 		return updateCategoriesError
 	}
 	return AddCategoriesByItem(categoriesByItem, db)
 }
 
 func DeleteCategory(categoriesByItem request.CategoryRequest, db *sql.DB) error  {
+	stmt, err := db.Prepare(`DELETE FROM category_item WHERE item=$1 AND category=$2`); if err != nil {
+		defer stmt.Close()
+		return err
+	}
+	defer stmt.Close()
 	for _, category := range categoriesByItem.Categories {
-		_, deleteCategoriesError := db.Query(`DELETE FROM category_item WHERE item=$1 AND category=$2`, &categoriesByItem.Item, &category); if deleteCategoriesError != nil {
+		_, deleteCategoriesError := stmt.Exec(&categoriesByItem.Item, &category); if deleteCategoriesError != nil {
 			return deleteCategoriesError
 		}
 	}

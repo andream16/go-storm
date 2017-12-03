@@ -8,7 +8,11 @@ import (
 )
 
 func GetTrendByManufacturer(manufacturer string, db *sql.DB) (request.Trend, error) {
-	rows, getTrendError := db.Query(`SELECT * FROM trend WHERE manufacturer=$1`, manufacturer); if getTrendError != nil {
+	stmt, err := db.Prepare(`SELECT * FROM trend WHERE manufacturer=$1`); if err != nil {
+		return request.Trend{}, err
+	}
+	defer stmt.Close()
+	rows, getTrendError := stmt.Query(manufacturer); if getTrendError != nil {
 		return request.Trend{}, errors.New(fmt.Sprintf("Unable to find trend rows for manufacturer %s", manufacturer))
 	}
 	defer rows.Close()
@@ -43,8 +47,12 @@ func DeleteTrendByManufacturer(trend request.Trend, db *sql.DB) error {
 }
 
 func addTrend(trend request.Trend, db *sql.DB) error {
+	stmt, err := db.Prepare(`INSERT INTO trend(manufacturer,value,date) VALUES ($1,$2,$3)`); if err != nil {
+		return err
+	}
+	defer stmt.Close()
 	for _, trendEntry := range trend.Trend {
-		_, insertError := db.Query(`INSERT INTO trend(manufacturer,value,date) VALUES ($1,$2,$3)`, trend.Manufacturer, trendEntry.Value, trendEntry.Date)
+		_, insertError := stmt.Exec(trend.Manufacturer, trendEntry.Value, trendEntry.Date)
 		if insertError != nil {
 			return insertError
 		}
@@ -53,7 +61,11 @@ func addTrend(trend request.Trend, db *sql.DB) error {
 }
 
 func deleteTrend(trend request.Trend, db *sql.DB) error {
-	_, deleteError := db.Query(`DELETE FROM trend WHERE manufacturer=$1`, trend.Manufacturer); if deleteError != nil {
+	stmt, err := db.Prepare(`DELETE FROM trend WHERE manufacturer=$1`); if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, deleteError := stmt.Exec(trend.Manufacturer); if deleteError != nil {
 		return deleteError
 	}
 	return nil

@@ -13,11 +13,15 @@ import (
 )
 
 // Initializes connection to Postgresql client and creates tables.
-func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
+func InitializePostgresql(conf *configuration.Configuration, environment *string) (*sql.DB, error) {
 	host := conf.Server.Host
-	/*if conf.Environment == "Production" {
+	if *environment != "" {
+		if *environment == "production" {
+			host = "db"
+		}
+	} else if conf.Environment == "production" {
 		host = "db"
-	}*/
+	}
 	connString := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=%s", host, conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE)
 	fmt.Println(fmt.Sprintf("Connecting to Postgresql with credentials: user=%s dbname=%s sslmode=%s using connection string = %s", conf.Database.USER, conf.Database.DBNAME, conf.Database.SSLMODE, connString))
 	db, dbErr := sql.Open(conf.Database.DRIVERNAME, connString); if dbErr != nil {
@@ -31,8 +35,10 @@ func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 	fmt.Println("Enum done. Now creating tables . . .")
 	createTables(db)
 	fmt.Println("Tables done.")
-	insertType := insert.DEV_INSERTS
-	if conf.Environment == "Production" {
+	var insertType []string
+	if host != "db" {
+		insertType = insert.DEV_INSERTS
+	} else {
 		insertType = insert.PROD_INSERTS
 	}
 	fmt.Println("Now inserting default inserts . . .")
@@ -44,7 +50,7 @@ func InitializePostgresql(conf *configuration.Configuration) (*sql.DB, error) {
 func createSequences(db *sql.DB) {
 	sequences := sequence.SEQUENCES
 	for k := range sequences {
-		_, sequenceError := db.Query(sequences[k]); if sequenceError != nil {
+		_, sequenceError := db.Exec(sequences[k]); if sequenceError != nil {
 			fmt.Println(fmt.Sprintf("unable to create sequence for %s, error: %s", k, sequenceError))
 		} else {
 			fmt.Println(fmt.Sprintf("created sequence for %s", k))

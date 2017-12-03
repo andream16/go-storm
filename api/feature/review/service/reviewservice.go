@@ -8,7 +8,11 @@ import (
 )
 
 func GetReviewByItem(item string, db *sql.DB) (request.Review, error) {
-	rows, getReviewError := db.Query(`SELECT item,date,content,sentiment,stars FROM review WHERE item=$1`, item); if getReviewError != nil {
+	stmt, err := db.Prepare(`SELECT item,date,content,sentiment,stars FROM review WHERE item=$1`); if err != nil {
+		return request.Review{}, err
+	}
+	defer stmt.Close()
+	rows, getReviewError := stmt.Query(item); if getReviewError != nil {
 		return request.Review{}, errors.New(fmt.Sprintf("Unable to find review rows for item %s", item))
 	}
 	defer rows.Close()
@@ -28,12 +32,20 @@ func GetReviewByItem(item string, db *sql.DB) (request.Review, error) {
 }
 
 func AddReview(review request.Review, db *sql.DB) error {
+	stmtInsert, err := db.Prepare(`INSERT INTO review(item,content,sentiment,stars,date) VALUES ($1,$2,$3,$4,$5)`); if err != nil {
+		return err
+	}
+	defer stmtInsert.Close()
+	stmtUpdate, err := db.Prepare(`UPDATE item set has_reviews = true where item =$1`); if err != nil {
+		return err
+	}
+	defer stmtUpdate.Close()
 	for _, reviewEntry := range review.Reviews {
-		_, insertError := db.Query(`INSERT INTO review(item,content,sentiment,stars,date) VALUES ($1,$2,$3,$4,$5)`, review.Item, reviewEntry.Content, reviewEntry.Sentiment, reviewEntry.Stars, reviewEntry.Date)
+		_, insertError := stmtInsert.Exec(review.Item, reviewEntry.Content, reviewEntry.Sentiment, reviewEntry.Stars, reviewEntry.Date)
 		if insertError != nil {
 			return insertError
 		}
-		_, insertItemError := db.Query(`UPDATE item set has_reviews = true where item =$1`, review.Item)
+		_, insertItemError := stmtUpdate.Exec(review.Item)
 		if insertItemError != nil {
 			return insertItemError
 		}
@@ -49,7 +61,11 @@ func EditReviewByItem(review request.Review, db *sql.DB) error {
 }
 
 func deleteReview(review request.Review, db *sql.DB) error {
-	_, deleteError := db.Query(`DELETE FROM review WHERE item=$1`, review.Item); if deleteError != nil {
+	stmt, err := db.Prepare(`DELETE FROM review WHERE item=$1`); if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, deleteError := stmt.Exec(review.Item); if deleteError != nil {
 		return deleteError
 	}
 	return nil

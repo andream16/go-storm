@@ -8,7 +8,11 @@ import (
 )
 
 func GetItemsByManufacturer(manufacturer string, db *sql.DB) ([]request.Item, error) {
-	rows, queryError := db.Query(`SELECT item FROM item WHERE manufacturer=$1 ORDER BY item ASC`, manufacturer); if queryError != nil {
+	stmt, err := db.Prepare(`SELECT item FROM item WHERE manufacturer=$1 ORDER BY item ASC`); if err != nil {
+		return []request.Item{}, err
+	}
+	defer stmt.Close()
+	rows, queryError := stmt.Query(manufacturer); if queryError != nil {
 		return []request.Item{}, errors.New(fmt.Sprintf("Unable to get item for manufacturer %s. Error: %s", manufacturer, queryError.Error()))
 	}
 	defer rows.Close()
@@ -28,7 +32,11 @@ func GetItemsByManufacturer(manufacturer string, db *sql.DB) ([]request.Item, er
 }
 
 func GetManufacturerByItem(itemId string, db *sql.DB) (request.Manufacturer, error) {
-	rows, queryError := db.Query(`SELECT manufacturer FROM item WHERE item=$1`, itemId); if queryError != nil {
+	stmt, err := db.Prepare(`SELECT manufacturer FROM item WHERE item=$1`); if err != nil {
+		return request.Manufacturer{}, err
+	}
+	defer stmt.Close()
+	rows, queryError := stmt.Query(itemId); if queryError != nil {
 		return request.Manufacturer{}, errors.New(fmt.Sprintf("Unable to get manufacturer for item %s. Error: %s", itemId, queryError.Error()))
 	}
 	defer rows.Close()
@@ -46,12 +54,16 @@ func GetManufacturerByItem(itemId string, db *sql.DB) (request.Manufacturer, err
 func GetManufacturers(page, size int, db *sql.DB) ([]request.Manufacturer, error) {
 	var manufacturers []request.Manufacturer
 	var start, end int
+	stmt, err := db.Prepare(`SELECT distinct name FROM manufacturer WHERE id BETWEEN $1 AND $2`); if err != nil {
+		return []request.Manufacturer{}, err
+	}
+	defer stmt.Close()
 	if page == 1 {
 		start = 1; end = size
 	} else {
 		start = ((page -1) * size) + 1; end = page * size
 	}
-	rows, queryError := db.Query(`SELECT distinct name FROM manufacturer WHERE id BETWEEN $1 AND $2`, start, end); if queryError != nil {
+	rows, queryError := stmt.Query(start, end); if queryError != nil {
 		return []request.Manufacturer{}, errors.New(fmt.Sprintf("Unable to get items for page %v and size %v. Error: %s", page, size, queryError.Error()))
 	}
 	defer rows.Close()
@@ -71,9 +83,11 @@ func GetManufacturers(page, size int, db *sql.DB) ([]request.Manufacturer, error
 }
 
 func AddManufacturer(manufacturer request.Manufacturer, db *sql.DB) error {
-	_, insertManufacturerError := db.Query(`INSERT INTO manufacturer(name)` +
-			` VALUES($1)`,
-			&manufacturer.Name); if insertManufacturerError != nil {
+	stmt, err := db.Prepare(`INSERT INTO manufacturer(name) VALUES($1)`); if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, insertManufacturerError := stmt.Exec(&manufacturer.Name); if insertManufacturerError != nil {
 			return insertManufacturerError
 		}
 
@@ -81,9 +95,12 @@ func AddManufacturer(manufacturer request.Manufacturer, db *sql.DB) error {
 }
 
 func DeleteManufacturer(manufacturer request.Manufacturer, db *sql.DB) error  {
-		_, deleteManufacturerError := db.Query(`DELETE FROM manufacturer WHERE name=$1`, &manufacturer.Name); if deleteManufacturerError != nil {
-			return deleteManufacturerError
-		}
+	stmt, err := db.Prepare(`DELETE FROM manufacturer WHERE name=$1`); if err != nil {
+		return err
+	}
+	_, deleteManufacturerError := stmt.Exec(&manufacturer.Name); if deleteManufacturerError != nil {
+		return deleteManufacturerError
+	}
 
 	return nil
 }

@@ -8,7 +8,12 @@ import (
 )
 
 func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
-	rows, queryError := db.Query(`SELECT price,date FROM forecast WHERE item=$1 ORDER BY date ASC`, itemId); if queryError != nil {
+	stmt, err := db.Prepare(`SELECT price,date FROM forecast WHERE item=$1 ORDER BY date ASC`); if err != nil {
+		defer stmt.Close()
+		return request.Forecast{}, err
+	}
+	defer stmt.Close()
+	rows, queryError := stmt.Query(itemId); if queryError != nil {
 		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecasts for item %s. Error: %s", itemId, queryError.Error()))
 	}
 	defer rows.Close()
@@ -32,9 +37,14 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 
 func AddForecasts(forecasts request.Forecast, db *sql.DB) error {
 	itemId := forecasts.Item
+	stmt, err := db.Prepare(`INSERT INTO forecast(name,item,price,date) VALUES ($1,$2,$3,$4)`); if err != nil {
+		defer stmt.Close()
+		return err
+	}
+	defer stmt.Close()
 	forecastType := forecasts.Name
 	for _, forecast := range forecasts.Forecast {
-		_, insertError := db.Query(`INSERT INTO forecast(name,item,price,date) VALUES ($1,$2,$3,$4)`, forecastType, itemId, forecast.Price, forecast.Date)
+		_, insertError := stmt.Exec(forecastType, itemId, forecast.Price, forecast.Date)
 		if insertError != nil {
 			return insertError
 		}
@@ -43,12 +53,17 @@ func AddForecasts(forecasts request.Forecast, db *sql.DB) error {
 }
 
 func EditForecast(forecasts request.Forecast, db *sql.DB) error {
+	stmtInsert, err := db.Prepare(`INSERT INTO forecast(name,item,price,date) VALUES ($1,$2,$3,$4)`); if err != nil {
+		defer stmtInsert.Close()
+		return err
+	}
+	defer stmtInsert.Close()
 	forecastType := forecasts.Name
-	_, deleteError := db.Query(`DELETE FROM forecast WHERE item=$1`, forecasts.Item); if deleteError != nil {
+	deleteError := DeleteForecast(forecasts.Item, db); if deleteError != nil {
 		return deleteError
 	}
 	for _, forecast := range forecasts.Forecast {
-		_, insertError := db.Query(`INSERT INTO forecast(name,item,price,date) VALUES ($1,$2,$3,$4)`, forecastType, forecasts.Item, forecast.Price, forecast.Date)
+		_, insertError := stmtInsert.Exec(forecastType, forecasts.Item, forecast.Price, forecast.Date)
 		if insertError != nil {
 			return insertError
 		}
@@ -57,7 +72,12 @@ func EditForecast(forecasts request.Forecast, db *sql.DB) error {
 }
 
 func DeleteForecast(itemId string, db *sql.DB) error {
-	_, deleteError := db.Query(`DELETE FROM forecast WHERE item=$1`, itemId); if deleteError != nil {
+	stmtDelete, err := db.Prepare(`DELETE FROM forecast WHERE item=$1`); if err != nil {
+		defer stmtDelete.Close()
+		return err
+	}
+	defer stmtDelete.Close()
+	_, deleteError := stmtDelete.Exec(itemId); if deleteError != nil {
 		return deleteError
 	}
 	return nil
