@@ -9,7 +9,7 @@ import (
 
 func GetItem(itemId string, db *sql.DB) request.Item {
 	var item request.Item
-	stmt, err := db.Prepare(`SELECT * FROM item WHERE item=$1`); if err != nil {
+	stmt, err := db.Prepare(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE item=$1`); if err != nil {
 		return request.Item{}
 	}
 	defer stmt.Close()

@@ -8,7 +8,7 @@ import (
 )
 
 func GetTrendByManufacturer(manufacturer string, db *sql.DB) (request.Trend, error) {
-	stmt, err := db.Prepare(`SELECT * FROM trend WHERE manufacturer=$1`); if err != nil {
+	stmt, err := db.Prepare(`SELECT manufacturer, value, date FROM trend WHERE manufacturer=$1`); if err != nil {
 		return request.Trend{}, err
 	}
 	defer stmt.Close()

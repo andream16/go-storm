@@ -42,7 +42,8 @@ func ItemHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 // @Resource /item
 // @Router /item [get]
 func getItem(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
-	page := r.URL.Query().Get("page"); if len(page) == 0 {
+	page := r.URL.Query().Get("page")
+	if len(page) == 0 {
 		itemId := r.URL.Query().Get("item"); if len(itemId) == 0 {
 			return response.Response{}, "badRequest"
 		}
