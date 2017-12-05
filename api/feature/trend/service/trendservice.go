@@ -8,7 +8,7 @@ import (
 )
 
 func GetTrendByManufacturer(manufacturer string, db *sql.DB) (request.Trend, error) {
-	stmt, err := db.Prepare(`SELECT manufacturer, value, date FROM trend WHERE manufacturer=$1`); if err != nil {
+	stmt, err := db.Prepare(`SELECT value,date FROM trend WHERE manufacturer=$1`); if err != nil {
 		return request.Trend{}, err
 	}
 	defer stmt.Close()
@@ -19,7 +19,7 @@ func GetTrendByManufacturer(manufacturer string, db *sql.DB) (request.Trend, err
 	var trend request.Trend; trend.Manufacturer = manufacturer
 	for rows.Next() {
 		var trendEntry request.TrendEntry
-		rowError := rows.Scan(&trendEntry.Date, &trendEntry.Value); if rowError != nil {
+		rowError := rows.Scan(&trendEntry.Value, &trendEntry.Date); if rowError != nil {
 			return request.Trend{}, errors.New(fmt.Sprintf("Unable to unmarshal trend entries for manufacturer %s. Error: %s", manufacturer, rowError.Error()))
 		}
 		trend.Trend = append(trend.Trend, trendEntry)

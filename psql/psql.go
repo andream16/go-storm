@@ -38,9 +38,9 @@ func InitializePostgresql(conf *configuration.Configuration, environment *string
 	var insertType []string
 	if host != "db" {
 		insertType = insert.DEV_INSERTS
-	} else {
+	} /*else {
 		insertType = insert.PROD_INSERTS
-	}
+	}*/
 	fmt.Println("Now inserting default inserts . . .")
 	defaultInserts(db, insertType)
 	fmt.Println("Inserts done. Postgresql initialization done.")
