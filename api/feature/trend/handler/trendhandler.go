@@ -43,7 +43,7 @@ func TrendHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 // @Resource /trend
 // @Router /trend [get]
 func getTrend(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
-	manufacturer := r.URL.Query().Get("item"); if len(manufacturer) == 0 {
+	manufacturer := r.URL.Query().Get("manufacturer"); if len(manufacturer) == 0 {
 		return response.Response{Status: "Not Found", Message: "Bad manufacturer entry."}, "badRequest"
 	}
 	trend, trendError := service.GetTrendByManufacturer(manufacturer, db); if trendError != nil {

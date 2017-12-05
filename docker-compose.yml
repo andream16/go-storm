@@ -6,7 +6,7 @@ services:
       POSTGRES_DB: priceprobe
       POSTGRES_USER: postgres
     ports:
-      - "5432:5432"
+      - "9042:5432"
   app:
     build: .
     command: ["./wait-for-it.sh", "db:5432", "--", "go", "run", "server.go", "-environment=production"]
