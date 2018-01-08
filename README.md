@@ -9,7 +9,14 @@ Golang PSQL ORM for Price Probe.
 
 ## Other useful commands
 
+### Docker
+
  - Run with no output `docker-compose up -d`
  - Stop with `docker-compose down`
  - Stop and remove images with `docker-compose down --rmi all`
  - Open Shell on one container with `docker exec -i -t container_id /bin/bash`
+
+### Postgresql
+
+  - Dump: `sudo -u postgres pg_dump -a -h xx.xxx.xxx.xxx -p xxxx -U postgres -d priceprobe > path_to_store_backup.sql`
+  - Restore: `sudo -u postgres psql -h xx.xxx.xxx.xxx -p xxxx -U postgres -d priceprobe < path_to_backup.sql`
