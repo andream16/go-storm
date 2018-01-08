@@ -1,9 +1,5 @@
 package insert
 
-var PROD_INSERTS = []string {
-	"INSERT INTO manufacturer(name) VALUES('no_manufacturer')",
-}
-
 var DEV_INSERTS = []string {
 	"INSERT INTO manufacturer(name) VALUES('no_manufacturer')",
 	"INSERT INTO item(item,manufacturer,url,image,title,description,has_reviews) VALUES('test1','no_manufacturer','www.google.com','gogigo.img','test','description',false)",

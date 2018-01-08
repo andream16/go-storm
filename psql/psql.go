@@ -35,15 +35,12 @@ func InitializePostgresql(conf *configuration.Configuration, environment *string
 	fmt.Println("Enum done. Now creating tables . . .")
 	createTables(db)
 	fmt.Println("Tables done.")
-	var insertType []string
 	if host != "db" {
-		insertType = insert.DEV_INSERTS
-	} else {
-		insertType = insert.PROD_INSERTS
+		fmt.Println("Now inserting default inserts . . .")
+		defaultInserts(db, insert.DEV_INSERTS)
+		fmt.Println("Inserts done.")
 	}
-	fmt.Println("Now inserting default inserts . . .")
-	defaultInserts(db, insertType)
-	fmt.Println("Inserts done. Postgresql initialization done.")
+	fmt.Println("Postgresql initialization done.")
 	return db, nil
 }
 
