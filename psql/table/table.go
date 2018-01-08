@@ -80,7 +80,7 @@ var CREATETABLES = map[string]string{
 	"forecast":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Forecast"] + " (" +
 		"id smallint NOT NULL DEFAULT nextval('forecast_id_seq'), " +
-		"name forecast_name, " +
+		"name text, " +
 		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"price double precision NOT NULL, " +
 		"date text NOT NULL," +
