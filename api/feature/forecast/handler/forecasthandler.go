@@ -11,6 +11,7 @@ import (
 	"github.com/andream16/go-storm/api/feature/forecast/service"
 	"fmt"
 )
+
 var itemHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) (interface{}, string) {
 	"GET"     : getForecast,
 	"POST"    : postForecast,

@@ -17,7 +17,17 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecasts for item %s. Error: %s", itemId, queryError.Error()))
 	}
 	defer rows.Close()
+	forecastNameQuery, forecastNameQueryError := db.Prepare(`SELECT name FROM forecast WHERE item=$1 LIMIT 1`)
+	if forecastNameQueryError != nil {
+		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecast's name for item %s. Error: %s", itemId, queryError.Error()))
+	}
+	defer forecastNameQuery.Close()
+	var forecastName string
+	nameError := forecastNameQuery.QueryRow(itemId).Scan(&forecastName); if nameError != nil || len(forecastName) == 0 {
+		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecast's name for item %s. Error: %s", itemId, queryError.Error()))
+	}
 	var forecasts request.Forecast
+	forecasts.Name = forecastName
 	forecasts.Item = itemId
 		for rows.Next() {
 			var forecast request.ForecastEntry
@@ -25,9 +35,8 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 			return request.Forecast{}, errors.New(fmt.Sprintf("Unable to unmarshal forecasts for item %s. Error: %s", itemId, rowError.Error()))
 			}
 			forecasts.Forecast = append(forecasts.Forecast, forecast)
-		};
-		iterationError := rows.Err();
-		if iterationError != nil {
+		}
+		iterationError := rows.Err(); if iterationError != nil {
 			return request.Forecast{}, errors.New(fmt.Sprintf("No forecasts found for item %s. Error: %s", itemId, iterationError.Error()))
 		}; if len(forecasts.Forecast) == 0 {
 			return request.Forecast{}, errors.New(fmt.Sprintf("No forecasts found for item %s", itemId))
@@ -37,6 +46,11 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 
 func AddForecasts(forecasts request.Forecast, db *sql.DB) error {
 	itemId := forecasts.Item
+	forecastsEntries, _ := GetForecasts(itemId, db); if len(forecastsEntries.Forecast) > 0 {
+		deleteForecastsError := DeleteForecast(itemId, db); if deleteForecastsError != nil {
+			return deleteForecastsError
+		}
+	}
 	stmt, err := db.Prepare(`INSERT INTO forecast(name,item,price,date) VALUES ($1,$2,$3,$4)`); if err != nil {
 		defer stmt.Close()
 		return err
