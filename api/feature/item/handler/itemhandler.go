@@ -33,9 +33,9 @@ func ItemHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Title getItem
-// @Description gets an item given its id as url param, else, checks for page and sizes and returns a slice of size items
+// @Description gets an item given its id or url as url param, else, checks for page and sizes and returns a slice of size items
 // @Accept  json
-// @Param   item        	query   string    false        "item"
+// @Param   item|url|title        	query   string    false        "item"
 // @Success 200 {object} response.Response    response.Response
 // @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
 // @Failure 500 {object} response.Response    {Status: "Internal Server Error", error.Error()}
@@ -44,29 +44,43 @@ func ItemHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 func getItem(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}, string) {
 	page := r.URL.Query().Get("page")
 	if len(page) == 0 {
-		itemId := r.URL.Query().Get("item"); if len(itemId) == 0 {
-			return response.Response{}, "badRequest"
-		}
-		item := service.GetItem(itemId, db)
-		if len(item.Item) == 0 || item.Item == ""  {
-			return response.Response{Status: "Not Found", Message: "Item not found"}, "badRequest"
-		}
-		return item, ""
-	} else {
-		size := r.URL.Query().Get("size"); if len(size) == 0 {
-			return response.Response{Status: "Not Found", Message: "Bad request"}, "badRequest"
-		}
-		p, pError := strconv.Atoi(page); if pError != nil {
-			return response.Response{Status: "Bad Request", Message: "Bad value for page"}, "badRequest"
-		}
-		s, sError := strconv.Atoi(size); if sError != nil {
-			return response.Response{Status: "Bad Request", Message: "Bad value for size"}, "badRequest"
-		}
-		items, itemsError := service.GetItems(p, s, db); if itemsError != nil {
-			return response.Response{Status: "Not Found", Message: itemsError.Error()}, "badRequest"
-		}
-		return request.Items{items}, ""
+		return getSingleItem(r, db)
 	}
+	return getMultipleItems(r, db, page)
+}
+
+func getSingleItem(r *http.Request, db *sql.DB) (interface{}, string) {
+	var key string
+	value := r.URL.Query().Get("item"); if len(value) == 0 {
+		value = r.URL.Query().Get("title"); if len(value) == 0 {
+			return response.Response{}, "badRequest"
+		} else {
+			key = "title"
+		}
+	} else {
+		key = "item"
+	}
+	item := service.GetItem(key, value, db)
+	if len(item.Item) == 0 || item.Item == ""  {
+		return response.Response{Status: "Not Found", Message: "Item not found"}, "badRequest"
+	}
+	return item, ""
+}
+
+func getMultipleItems(r *http.Request, db *sql.DB, page string) (interface{}, string) {
+	size := r.URL.Query().Get("size"); if len(size) == 0 {
+		return response.Response{Status: "Not Found", Message: "Bad request"}, "badRequest"
+	}
+	p, pError := strconv.Atoi(page); if pError != nil {
+		return response.Response{Status: "Bad Request", Message: "Bad value for page"}, "badRequest"
+	}
+	s, sError := strconv.Atoi(size); if sError != nil {
+		return response.Response{Status: "Bad Request", Message: "Bad value for size"}, "badRequest"
+	}
+	items, itemsError := service.GetItems(p, s, db); if itemsError != nil {
+		return response.Response{Status: "Not Found", Message: itemsError.Error()}, "badRequest"
+	}
+	return request.Items{items}, ""
 }
 
 // @Title postItem

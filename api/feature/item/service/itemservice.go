@@ -7,13 +7,13 @@ import (
 	"fmt"
 )
 
-func GetItem(itemId string, db *sql.DB) request.Item {
+func GetItem(key string, value string, db *sql.DB) request.Item {
 	var item request.Item
-	stmt, err := db.Prepare(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE item=$1`); if err != nil {
+	stmt, err := db.Prepare(fmt.Sprintf(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE %s = $1`, key)); if err != nil {
 		return request.Item{}
 	}
 	defer stmt.Close()
-	selectError := stmt.QueryRow(itemId).Scan(&item.Item, &item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews)
+	selectError := stmt.QueryRow(value).Scan(&item.Item, &item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews)
 	if selectError != nil {
 		return request.Item{}
 	}
