@@ -39,8 +39,8 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 		iterationError := rows.Err(); if iterationError != nil {
 			return request.Forecast{}, errors.New(fmt.Sprintf("No forecasts found for item %s. Error: %s", itemId, iterationError.Error()))
 		}; if len(forecasts.Forecast) == 0 {
-			return request.Forecast{}, errors.New(fmt.Sprintf("No forecasts found for item %s", itemId))
-			}
+			return forecasts, nil
+		}
 	return forecasts, nil
 }
 
