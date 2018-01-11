@@ -8,39 +8,38 @@ import (
 )
 
 func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
+	emptyResponse := request.Forecast{Item: itemId, Name: "", Forecast: []request.ForecastEntry{}}
 	stmt, err := db.Prepare(`SELECT price,date FROM forecast WHERE item=$1 ORDER BY date ASC`); if err != nil {
 		defer stmt.Close()
 		return request.Forecast{}, err
 	}
 	defer stmt.Close()
 	rows, queryError := stmt.Query(itemId); if queryError != nil {
-		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecasts for item %s. Error: %s", itemId, queryError.Error()))
+		return emptyResponse, nil
 	}
 	defer rows.Close()
 	forecastNameQuery, forecastNameQueryError := db.Prepare(`SELECT name FROM forecast WHERE item=$1 LIMIT 1`)
 	if forecastNameQueryError != nil {
-		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecast's name for item %s. Error: %s", itemId, queryError.Error()))
+		return emptyResponse, nil
 	}
 	defer forecastNameQuery.Close()
 	var forecastName string
 	nameError := forecastNameQuery.QueryRow(itemId).Scan(&forecastName); if nameError != nil || len(forecastName) == 0 {
-		return request.Forecast{}, errors.New(fmt.Sprintf("Unable to get forecast's name for item %s. Error: %s", itemId, queryError.Error()))
+		return emptyResponse, nil
 	}
 	var forecasts request.Forecast
 	forecasts.Name = forecastName
 	forecasts.Item = itemId
-		for rows.Next() {
-			var forecast request.ForecastEntry
-			rowError := rows.Scan(&forecast.Price, &forecast.Date); if rowError != nil {
+	for rows.Next() {
+		var forecast request.ForecastEntry
+		rowError := rows.Scan(&forecast.Price, &forecast.Date); if rowError != nil {
 			return request.Forecast{}, errors.New(fmt.Sprintf("Unable to unmarshal forecasts for item %s. Error: %s", itemId, rowError.Error()))
-			}
-			forecasts.Forecast = append(forecasts.Forecast, forecast)
 		}
-		iterationError := rows.Err(); if iterationError != nil {
-			return request.Forecast{}, errors.New(fmt.Sprintf("No forecasts found for item %s. Error: %s", itemId, iterationError.Error()))
-		}; if len(forecasts.Forecast) == 0 {
-			return forecasts, nil
-		}
+		forecasts.Forecast = append(forecasts.Forecast, forecast)
+	}
+	iterationError := rows.Err(); if iterationError != nil {
+		return request.Forecast{}, errors.New(fmt.Sprintf("No forecasts found for item %s. Error: %s", itemId, iterationError.Error()))
+	}
 	return forecasts, nil
 }
 

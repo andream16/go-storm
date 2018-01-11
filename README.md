@@ -20,3 +20,9 @@ Golang PSQL ORM for Price Probe.
 
   - Dump: `sudo -u postgres pg_dump -a -h xx.xxx.xxx.xxx -p xxxx -U postgres -d priceprobe > path_to_store_backup.sql`
   - Restore: `sudo -u postgres psql -h xx.xxx.xxx.xxx -p xxxx -U postgres -d priceprobe < path_to_backup.sql`
+
+# Run with Goland
+
+  - Start PostgresSQL: `sudo systemctl start postgresql`
+  - Create a Database called `priceprobe`
+  - Edit your Run configuration program's arguments by passing `-environment=development`
