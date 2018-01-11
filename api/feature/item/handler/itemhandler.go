@@ -77,10 +77,10 @@ func getMultipleItems(r *http.Request, db *sql.DB, page string) (interface{}, st
 	s, sError := strconv.Atoi(size); if sError != nil {
 		return response.Response{Status: "Bad Request", Message: "Bad value for size"}, "badRequest"
 	}
-	items, itemsError := service.GetItems(p, s, db); if itemsError != nil {
+	itemsResponse, itemsError := service.GetItems(p, s, db); if itemsError != nil {
 		return response.Response{Status: "Not Found", Message: itemsError.Error()}, "badRequest"
 	}
-	return request.Items{items}, ""
+	return itemsResponse, ""
 }
 
 // @Title postItem

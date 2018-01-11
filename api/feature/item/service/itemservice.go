@@ -20,35 +20,51 @@ func GetItem(key string, value string, db *sql.DB) request.Item {
 	return item
 }
 
-func GetItems(page, size int, db *sql.DB) ([]request.Item, error) {
+func GetItems(page, size int, db *sql.DB) (request.Items, error) {
 	var items []request.Item
 	var start, end int
+	hasNext := hasNextPaginatedItems(page, size, db)
 	stmt, err := db.Prepare(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE id BETWEEN $1 AND $2`); if err != nil {
-		return []request.Item{}, err
+		return request.Items{}, err
 	}
 	defer stmt.Close()
 	if page == 1 {
 		start = 1; end = size
 	} else {
-		start = ((page -1) * size) + 1; end = page * size
+		start = ((page - 1) * size) + 1; end = page * size
 	}
 	rows, queryError := stmt.Query(start, end); if queryError != nil {
-		return []request.Item{}, errors.New(fmt.Sprintf("Unable to get items for page %v and size %v. Error: %s", page, size, queryError.Error()))
+		return request.Items{}, errors.New(fmt.Sprintf("Unable to get items for page %v and size %v. Error: %s", page, size, queryError.Error()))
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var item request.Item
 		rowError := rows.Scan(&item.Item, &item.Manufacturer, &item.URL, &item.Image, &item.Title, &item.Description, &item.HasReviews)
 		if rowError != nil {
-			return []request.Item{}, errors.New(fmt.Sprintf("Unable to unmarshal items for page %v and size %v. Error: %s", page, size, rowError.Error()))
+			return request.Items{}, errors.New(fmt.Sprintf("Unable to unmarshal items for page %v and size %v. Error: %s", page, size, rowError.Error()))
 		}
 		items = append(items, item)
 	}; iterationError := rows.Err(); if iterationError != nil {
-		return []request.Item{}, errors.New(fmt.Sprintf("No items found for page %v and size %v. Error: %s", page, size, iterationError.Error()))
+		return request.Items{}, errors.New(fmt.Sprintf("No items found for page %v and size %v. Error: %s", page, size, iterationError.Error()))
 	}; if len(items) == 0 {
-		return []request.Item{}, errors.New(fmt.Sprintf("No items found for page %v and size %v", page, size))
+		return request.Items{}, errors.New(fmt.Sprintf("No items found for page %v and size %v", page, size))
 	}
-	return items, nil
+	return request.Items{Items: items, HasNext: hasNext}, nil
+}
+
+func hasNextPaginatedItems(page, size int, db *sql.DB) bool {
+	var count int
+	stmt, err := db.Prepare(`SELECT COUNT(item) FROM item`); if err != nil {
+		return false
+	}
+	defer stmt.Close()
+	selectError := stmt.QueryRow().Scan(&count); if selectError != nil {
+		return false
+	}
+	if count > (page * size) {
+		return true
+	}
+	return false
 }
 
 func AddItem(item request.Item, db *sql.DB) error {

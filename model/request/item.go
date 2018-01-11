@@ -12,4 +12,5 @@ type Item struct {
 
 type Items struct {
 	Items []Item `json:"items"`
+	HasNext bool `json:"has_next"`
 }
