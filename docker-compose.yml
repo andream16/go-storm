@@ -7,22 +7,14 @@ services:
       POSTGRES_USER: postgres
     ports:
       - "9042:5432"
-  backend:
+  app:
     build: .
     command: ["./wait-for-it.sh", "db:5432", "--", "go", "run", "server.go", "-environment=production"]
     volumes:
       - .:/go/src/github.com/andream16/go-storm
     ports:
-      - "80:80"
+      - "8080:8080"
     depends_on:
       - db
     links:
       - db
-  frontend:
-    build: ./docker/frontend
-    ports:
-      - "4200:4200"
-    depends_on:
-      - backend
-    links:
-      - backend
