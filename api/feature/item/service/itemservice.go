@@ -24,7 +24,8 @@ func GetItems(page, size int, db *sql.DB) (request.Items, error) {
 	var items []request.Item
 	var start, end int
 	hasNext := hasNextPaginatedItems(page, size, db)
-	stmt, err := db.Prepare(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE id BETWEEN $1 AND $2`); if err != nil {
+	stmt, err := db.Prepare(`SELECT item,manufacturer,url,image,title,description,has_reviews FROM item WHERE id BETWEEN $1 AND $2 ORDER BY title DESC`)
+	if err != nil {
 		return request.Items{}, err
 	}
 	defer stmt.Close()
