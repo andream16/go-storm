@@ -95,7 +95,7 @@ var CREATETABLES = map[string]string{
 		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"price double precision NOT NULL, " +
 		"date text NOT NULL," +
-		"score double precision NOT NULL, " +
+		"score double precision NOT NULL DEFAULT 0.0, " +
 		"PRIMARY KEY (name,item,price,date)" +
 		")",
 	"category_item":
