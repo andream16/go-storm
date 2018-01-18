@@ -15,6 +15,7 @@ import (
 	priceHandler "github.com/andream16/go-storm/api/feature/price/handler"
 	manufacturerHandler "github.com/andream16/go-storm/api/feature/manufacturer/handler"
 	reviewHandler "github.com/andream16/go-storm/api/feature/review/handler"
+	reviewTmpHandler "github.com/andream16/go-storm/api/feature/review_tmp/handler"
 	forecastHandler "github.com/andream16/go-storm/api/feature/forecast/handler"
 	categoryHandler "github.com/andream16/go-storm/api/feature/category/handler"
 	currencyHandler "github.com/andream16/go-storm/api/feature/currency/handler"
@@ -34,6 +35,7 @@ func InitializeEndpoint(conf *configuration.Configuration, db *sql.DB) {
 	mux.HandleFunc("/api/price", 			priceHandler.PriceHandler(db))
 	mux.HandleFunc("/api/manufacturer", 	manufacturerHandler.ManufacturerHandler(db))
 	mux.HandleFunc("/api/review", 		reviewHandler.ReviewHandler(db))
+	mux.HandleFunc("/api/review_tmp",    reviewTmpHandler.ReviewTmpHandler(db))
 	mux.HandleFunc("/api/forecast", 		forecastHandler.ForecastHandler(db))
 	mux.HandleFunc("/api/category", 		categoryHandler.CategoryHandler(db))
 	mux.HandleFunc("/api/currency", 		currencyHandler.CurrencyHandler(db))

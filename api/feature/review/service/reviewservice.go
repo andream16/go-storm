@@ -8,7 +8,7 @@ import (
 )
 
 func GetReviewByItem(item string, db *sql.DB) (request.Review, error) {
-	stmt, err := db.Prepare(`SELECT item,date,content,sentiment,stars FROM review WHERE item=$1`); if err != nil {
+	stmt, err := db.Prepare(`SELECT item,date,content,sentiment,stars FROM review WHERE item=$1 ORDER BY date ASC`); if err != nil {
 		return request.Review{}, err
 	}
 	defer stmt.Close()

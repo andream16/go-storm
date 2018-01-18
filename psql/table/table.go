@@ -1,12 +1,13 @@
 package table
 
-var ORDER = [9]string {
+var ORDER = [10]string {
 	"manufacturer",
 	"currency",
 	"trend",
 	"item",
 	"price",
 	"review",
+	"review_tmp",
 	"category",
 	"forecast",
 	"category_item",
@@ -19,6 +20,7 @@ var TABLES = map[string]string {
 	"Item" 		   : "item",
 	"Price"        : "price",
 	"Review"       : "review",
+	"Review_Tmp"   : "review_tmp",
 	"Category"     : "category",
 	"Forecast" 	   : "forecast",
 	"Category_Item": "category_item",
@@ -73,6 +75,15 @@ var CREATETABLES = map[string]string{
 		"sentiment smallint, constraint valid_sentiment check(sentiment BETWEEN 0 AND 1), " +
 		"stars smallint, constraint valid_stars check(stars BETWEEN 1 AND 5)" +
 		")",
+	"review_tmp":
+	"CREATE TABLE IF NOT EXISTS " + TABLES["Review_Tmp"] + " (" +
+		"id smallint NOT NULL DEFAULT nextval('review_tmp_id_seq') PRIMARY KEY, " +
+		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
+		"content text, " +
+		"date text, " +
+		"sentiment double precision" +
+		"stars double precision" +
+		")",
 	"category":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Category"] + " (" +
 		"category text PRIMARY KEY" +
@@ -84,6 +95,7 @@ var CREATETABLES = map[string]string{
 		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"price double precision NOT NULL, " +
 		"date text NOT NULL," +
+		"score double precision NOT NULL, " +
 		"PRIMARY KEY (name,item,price,date)" +
 		")",
 	"category_item":
