@@ -6,7 +6,10 @@ import (
 )
 
 func AddTmpReview(review request.ReviewTmp, db *sql.DB) error {
-	stmtInsert, err := db.Prepare(`INSERT INTO review_tmp(item,content,sentiment,stars,date) VALUES ($1,$2,$3,$4,$5)`); if err != nil {
+	deleteError := deleteTmpReviewsByItem(review.Item, db); if deleteError != nil {
+		return deleteError
+	}
+	stmtInsert, err := db.Prepare(`INSERT INTO reviewtmp(item,content,sentiment,stars,date) VALUES ($1,$2,$3,$4,$5)`); if err != nil {
 		return err
 	}
 	defer stmtInsert.Close()
@@ -15,6 +18,17 @@ func AddTmpReview(review request.ReviewTmp, db *sql.DB) error {
 		if insertError != nil {
 			return insertError
 		}
+	}
+	return nil
+}
+
+func deleteTmpReviewsByItem(item string, db *sql.DB) error {
+	stmtDelete, err := db.Prepare(`DELETE FROM reviewtmp WHERE item= $1`); if err != nil {
+		return err
+	}
+	defer stmtDelete.Close()
+	_, deleteError := stmtDelete.Exec(item); if deleteError != nil {
+		return deleteError
 	}
 	return nil
 }

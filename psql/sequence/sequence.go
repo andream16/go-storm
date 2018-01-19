@@ -5,6 +5,6 @@ var SEQUENCES = map[string]string {
 	"Item"		   : "CREATE SEQUENCE item_id_seq",
 	"Price"        : "CREATE SEQUENCE price_id_seq",
 	"Review"       : "CREATE SEQUENCE review_id_seq",
-	"Review_Tmp"       : "CREATE SEQUENCE review_tmp_id_seq",
+	"ReviewTmp"    : "CREATE SEQUENCE review_tmp_id_seq",
 	"Forecast"     : "CREATE SEQUENCE forecast_id_seq",
 }
