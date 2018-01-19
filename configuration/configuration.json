@@ -2,7 +2,7 @@
   "ENVIRONMENT" : "development",
   "SERVER" : {
     "HOST" : "localhost",
-    "PORT" : 8080
+    "PORT" : 80
   },
   "DATABASE" : {
     "DRIVERNAME" : "postgres",
