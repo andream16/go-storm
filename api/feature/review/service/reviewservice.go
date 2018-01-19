@@ -3,8 +3,8 @@ package service
 import (
 	"database/sql"
 	"github.com/andream16/go-storm/model/request"
-	"github.com/go-errors/errors"
 	"fmt"
+	"errors"
 )
 
 func GetReviewByItem(item string, db *sql.DB) (request.Review, error) {
@@ -31,46 +31,38 @@ func GetReviewByItem(item string, db *sql.DB) (request.Review, error) {
 	return review, nil
 }
 
-func AddReview(review request.Review, db *sql.DB) error {
+
+func AddReviews(review request.Review, db *sql.DB) error {
+	deleteError := DeleteReviewsByItem(review.Item, db); if deleteError != nil {
+		return deleteError
+	}
 	stmtInsert, err := db.Prepare(`INSERT INTO review(item,content,sentiment,stars,date) VALUES ($1,$2,$3,$4,$5)`); if err != nil {
 		return err
 	}
 	defer stmtInsert.Close()
-	stmtUpdate, err := db.Prepare(`UPDATE item set has_reviews = true where item =$1`); if err != nil {
-		return err
-	}
-	defer stmtUpdate.Close()
 	for _, reviewEntry := range review.Reviews {
 		_, insertError := stmtInsert.Exec(review.Item, reviewEntry.Content, reviewEntry.Sentiment, reviewEntry.Stars, reviewEntry.Date)
 		if insertError != nil {
 			return insertError
-		}
-		_, insertItemError := stmtUpdate.Exec(review.Item)
-		if insertItemError != nil {
-			return insertItemError
 		}
 	}
 	return nil
 }
 
 func EditReviewByItem(review request.Review, db *sql.DB) error {
-	deleteError := deleteReview(review, db); if deleteError != nil {
+	deleteError := DeleteReviewsByItem(review.Item, db); if deleteError != nil {
 		return deleteError
 	}
-	return  AddReview(review, db)
+	return  AddReviews(review, db)
 }
 
-func deleteReview(review request.Review, db *sql.DB) error {
-	stmt, err := db.Prepare(`DELETE FROM review WHERE item=$1`); if err != nil {
+func DeleteReviewsByItem(item string, db *sql.DB) error {
+	stmtDelete, err := db.Prepare(`DELETE FROM review WHERE item= $1`); if err != nil {
 		return err
 	}
-	defer stmt.Close()
-	_, deleteError := stmt.Exec(review.Item); if deleteError != nil {
+	defer stmtDelete.Close()
+	_, deleteError := stmtDelete.Exec(item); if deleteError != nil {
 		return deleteError
 	}
 	return nil
-}
-
-func DeleteReviewByItem(review request.Review, db *sql.DB) error {
-	return deleteReview(review, db)
 }

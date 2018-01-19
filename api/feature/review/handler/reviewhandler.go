@@ -15,7 +15,7 @@ import (
 var reviewHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) (interface{}, string) {
 	"GET"     : getReview,
 	"POST"    : postReview,
-	"PUT"  	  : putReview,
+	"PUT"     : putReview,
 	"DELETE"  : deleteReview,
 }
 
@@ -66,7 +66,7 @@ func postReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{}
 	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Reviews) == 0  {
 		return response.Response{Status: "Bad Request", Message: "Bad body"}, "badRequest"
 	}
-	addReviewError := service.AddReview(review, db); if addReviewError != nil {
+	addReviewError := service.AddReviews(review, db); if addReviewError != nil {
 		return response.Response{Status: "Bad Request", Message: addReviewError.Error()}, "serverError"
 	}
 	return response.Response{Status: "Ok", Message: fmt.Sprintf("Successfully added review for item %s.", review.Item)}, ""
@@ -106,7 +106,7 @@ func deleteReview(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface
 	decodeReviewErr := json.NewDecoder(r.Body).Decode(&review); if decodeReviewErr != nil || len(review.Reviews) == 0  {
 		return response.Response{Status: "Bad Request", Message: "Bad body"}, "badRequest"
 	}
-	deleteReviewError := service.DeleteReviewByItem(review, db); if deleteReviewError != nil {
+	deleteReviewError := service.DeleteReviewsByItem(review.Item, db); if deleteReviewError != nil {
 		return response.Response{Status: "Bad Request", Message: deleteReviewError.Error()}, "serverError"
 	}
 	return response.Response{Status: "Ok", Message: fmt.Sprintf("Successfully deleted review for item %s.", review.Item)}, ""

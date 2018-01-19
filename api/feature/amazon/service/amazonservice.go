@@ -24,7 +24,7 @@ func AddAmazonEntry(amazonEntry request.Amazon, db *sql.DB) error {
 		categoryService.AddCategoriesByItem(category, db)
 	}
 	if len(review.Item) > 0 {
-		reviewService.AddReview(review, db)
+		reviewService.AddReviews(review, db)
 	}
 	return nil
 }

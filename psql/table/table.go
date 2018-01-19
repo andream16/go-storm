@@ -7,7 +7,6 @@ var ORDER = [10]string {
 	"item",
 	"price",
 	"review",
-	"reviewtmp",
 	"category",
 	"forecast",
 	"category_item",
@@ -20,7 +19,6 @@ var TABLES = map[string]string {
 	"Item" 		   : "item",
 	"Price"        : "price",
 	"Review"       : "review",
-	"ReviewTmp"   : "reviewtmp",
 	"Category"     : "category",
 	"Forecast" 	   : "forecast",
 	"Category_Item": "category_item",
@@ -69,15 +67,6 @@ var CREATETABLES = map[string]string{
 	"review":
 	"CREATE TABLE IF NOT EXISTS " + TABLES["Review"] + " (" +
 		"id smallint NOT NULL DEFAULT nextval('review_id_seq') PRIMARY KEY, " +
-		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
-		"content text, " +
-		"date text, " +
-		"sentiment smallint, constraint valid_sentiment check(sentiment BETWEEN 0 AND 1), " +
-		"stars smallint, constraint valid_stars check(stars BETWEEN 1 AND 5)" +
-		")",
-	"reviewtmp":
-	"CREATE TABLE IF NOT EXISTS " + TABLES["ReviewTmp"] + " (" +
-		"id smallint NOT NULL DEFAULT nextval('review_tmp_id_seq') PRIMARY KEY, " +
 		"item text REFERENCES " + TABLES["Item"] + "(item) ON DELETE CASCADE ON UPDATE CASCADE, " +
 		"content text DEFAULT '', " +
 		"date text, " +
