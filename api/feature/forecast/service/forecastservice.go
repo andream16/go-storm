@@ -34,11 +34,11 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 	for rows.Next() {
 		var forecast request.ForecastEntry
 		rowError := rows.Scan(&forecast.Price, &forecast.Date, &forecast.Score); if rowError != nil {
-			if !scoreHasBeenSet {
-				forecasts.Score = forecast.Score
-				scoreHasBeenSet = true
-			}
 			return request.Forecast{}, errors.New(fmt.Sprintf("Unable to unmarshal forecasts for item %s. Error: %s", itemId, rowError.Error()))
+		}
+		if !scoreHasBeenSet {
+			forecasts.Score = forecast.Score
+			scoreHasBeenSet = true
 		}
 		forecasts.Forecast = append(forecasts.Forecast, request.ForecastEntry{
 			Price: forecast.Price,
