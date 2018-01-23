@@ -9,7 +9,7 @@ import (
 
 func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 	emptyResponse := request.Forecast{Item: itemId, Name: "", Forecast: []request.ForecastEntry{}}
-	stmt, err := db.Prepare(`SELECT price,date,score FROM forecast WHERE item=$1 ORDER BY date ASC`); if err != nil {
+	stmt, err := db.Prepare(`SELECT price,date,score,test_size FROM forecast WHERE item=$1 ORDER BY date ASC`); if err != nil {
 		defer stmt.Close()
 		return request.Forecast{}, err
 	}
@@ -30,13 +30,14 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 	var forecasts request.Forecast
 	forecasts.Name = forecastName
 	forecasts.Item = itemId
-	scoreHasBeenSet := false
+	scoreAndTestSizeHaveBeenSet := false
 	for rows.Next() {
 		var forecast request.ForecastEntry
-		rowError := rows.Scan(&forecast.Price, &forecast.Date, &forecast.Score); if rowError != nil {
-			if !scoreHasBeenSet {
+		rowError := rows.Scan(&forecast.Price, &forecast.Date, &forecast.Score, &forecast.TestSize); if rowError != nil {
+			if !scoreAndTestSizeHaveBeenSet {
 				forecasts.Score = forecast.Score
-				scoreHasBeenSet = true
+				forecasts.TestSize = forecast.TestSize
+				scoreAndTestSizeHaveBeenSet = true
 			}
 			return request.Forecast{}, errors.New(fmt.Sprintf("Unable to unmarshal forecasts for item %s. Error: %s", itemId, rowError.Error()))
 		}
@@ -58,14 +59,14 @@ func AddForecasts(forecasts request.Forecast, db *sql.DB) error {
 			return deleteForecastsError
 		}
 	}
-	stmt, err := db.Prepare(`INSERT INTO forecast(name,item,price,date,score) VALUES ($1,$2,$3,$4,$5)`); if err != nil {
+	stmt, err := db.Prepare(`INSERT INTO forecast(name,item,price,date,score,test_size) VALUES ($1,$2,$3,$4,$5,$6)`); if err != nil {
 		defer stmt.Close()
 		return err
 	}
 	defer stmt.Close()
 	forecastType := forecasts.Name
 	for _, forecast := range forecasts.Forecast {
-		_, insertError := stmt.Exec(forecastType, itemId, forecast.Price, forecast.Date, forecast.Score)
+		_, insertError := stmt.Exec(forecastType, itemId, forecast.Price, forecast.Date, forecast.Score, forecast.TestSize)
 		if insertError != nil {
 			return insertError
 		}
@@ -74,7 +75,7 @@ func AddForecasts(forecasts request.Forecast, db *sql.DB) error {
 }
 
 func EditForecast(forecasts request.Forecast, db *sql.DB) error {
-	stmtInsert, err := db.Prepare(`INSERT INTO forecast(name,item,price,date,score) VALUES ($1,$2,$3,$4,$5)`); if err != nil {
+	stmtInsert, err := db.Prepare(`INSERT INTO forecast(name,item,price,date,score,test_size) VALUES ($1,$2,$3,$4,$5,$6)`); if err != nil {
 		defer stmtInsert.Close()
 		return err
 	}
@@ -84,7 +85,7 @@ func EditForecast(forecasts request.Forecast, db *sql.DB) error {
 		return deleteError
 	}
 	for _, forecast := range forecasts.Forecast {
-		_, insertError := stmtInsert.Exec(forecastType, forecasts.Item, forecast.Price, forecast.Date, forecast.Score)
+		_, insertError := stmtInsert.Exec(forecastType, forecasts.Item, forecast.Price, forecast.Date, forecast.Score, forecast.TestSize)
 		if insertError != nil {
 			return insertError
 		}

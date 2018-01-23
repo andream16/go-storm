@@ -85,6 +85,7 @@ var CREATETABLES = map[string]string{
 		"price double precision NOT NULL, " +
 		"date text NOT NULL," +
 		"score double precision NOT NULL DEFAULT 0.0, " +
+		"test_size text NOT NULL DEFAULT '10%' ," +
 		"PRIMARY KEY (name,item,price,date)" +
 		")",
 	"category_item":
