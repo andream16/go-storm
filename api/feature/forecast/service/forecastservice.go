@@ -7,14 +7,14 @@ import (
 	"errors"
 )
 
-func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
+func GetForecastByItemAndForecastTestSize(itemId, testSize string, db *sql.DB) (request.Forecast, error) {
 	emptyResponse := request.Forecast{Item: itemId, Name: "", Forecast: []request.ForecastEntry{}}
-	stmt, err := db.Prepare(`SELECT price,date,score,test_size FROM forecast WHERE item=$1 ORDER BY date ASC`); if err != nil {
+	stmt, err := db.Prepare(`SELECT price,date,score,test_size FROM forecast WHERE item=$1 AND test_size=$2 ORDER BY date ASC`); if err != nil {
 		defer stmt.Close()
 		return request.Forecast{}, err
 	}
 	defer stmt.Close()
-	rows, queryError := stmt.Query(itemId); if queryError != nil {
+	rows, queryError := stmt.Query(itemId, testSize); if queryError != nil {
 		return emptyResponse, nil
 	}
 	defer rows.Close()
@@ -54,7 +54,8 @@ func GetForecasts(itemId string, db *sql.DB) (request.Forecast, error) {
 
 func AddForecasts(forecasts request.Forecast, db *sql.DB) error {
 	itemId := forecasts.Item
-	forecastsEntries, _ := GetForecasts(itemId, db); if len(forecastsEntries.Forecast) > 0 {
+	testSize := forecasts.TestSize
+	forecastsEntries, _ := GetForecastByItemAndForecastTestSize(itemId, testSize, db); if len(forecastsEntries.Forecast) > 0 {
 		deleteForecastsError := DeleteForecast(itemId, db); if deleteForecastsError != nil {
 			return deleteForecastsError
 		}

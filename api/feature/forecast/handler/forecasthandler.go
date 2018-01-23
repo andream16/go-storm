@@ -38,6 +38,7 @@ func ForecastHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 // @Description gets all forecasts of an item given an itemId.
 // @Accept  json
 // @Param   item        	query   string    true        "item"
+// @Param   test_size       query   string    true        "test_size"
 // @Success 200 {object} response.Response    response.Response
 // @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
 // @Failure 500 {object} response.Response    {Status: "Internal Server Error", error.Error()}
@@ -47,16 +48,18 @@ func getForecast(w http.ResponseWriter, r *http.Request, db *sql.DB) (interface{
 	itemId := r.URL.Query().Get("item"); if len(itemId) == 0 {
 		return response.Response{Status: "Bad Request", Message: "No item id was passed."}, "badRequest"
 	}
-	forecasts, forecastsError := service.GetForecasts(itemId, db); if forecastsError != nil {
-		return response.Response{Status: "Internal Server Error", Message: forecastsError.Error()}, "serverError"
+	forecastTestSize := r.URL.Query().Get("test_size"); if len(forecastTestSize) == 0 {
+		return response.Response{Status: "Bad Request", Message: "No forecast test size found."}, "badRequest"
 	}
-	return forecasts, ""
+	forecast, forecastError := service.GetForecastByItemAndForecastTestSize(itemId, forecastTestSize, db); if forecastError != nil {
+		return response.Response{Status: "Internal Server Error", Message: forecastError.Error()}, "serverError"
+	}
+	return forecast, ""
 }
 
 // @Title postForecast
 // @Description add [](price, date) for a given item.
 // @Accept  json
-// @Param   item        	query   string    		  true        "item"
 // @Param   forecasts       query   request.Forecasts true        "forecasts"
 // @Success 200 {object} response.Response    response.Response
 // @Failure 403 {object} response.Response    {Status: "Bad Request", Message: error.Error()}
