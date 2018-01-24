@@ -56,7 +56,7 @@ func AddForecasts(forecasts request.Forecast, db *sql.DB) error {
 	itemId := forecasts.Item
 	testSize := forecasts.TestSize
 	forecastsEntries, _ := GetForecastByItemAndForecastTestSize(itemId, testSize, db); if len(forecastsEntries.Forecast) > 0 {
-		deleteForecastsError := DeleteForecast(itemId, db); if deleteForecastsError != nil {
+		deleteForecastsError := DeleteForecast(itemId, testSize, db); if deleteForecastsError != nil {
 			return deleteForecastsError
 		}
 	}
@@ -82,7 +82,7 @@ func EditForecast(forecasts request.Forecast, db *sql.DB) error {
 	}
 	defer stmtInsert.Close()
 	forecastType := forecasts.Name
-	deleteError := DeleteForecast(forecasts.Item, db); if deleteError != nil {
+	deleteError := DeleteForecast(forecasts.Item, forecasts.TestSize, db); if deleteError != nil {
 		return deleteError
 	}
 	for _, forecast := range forecasts.Forecast {
@@ -94,13 +94,13 @@ func EditForecast(forecasts request.Forecast, db *sql.DB) error {
 	return nil
 }
 
-func DeleteForecast(itemId string, db *sql.DB) error {
-	stmtDelete, err := db.Prepare(`DELETE FROM forecast WHERE item=$1`); if err != nil {
+func DeleteForecast(itemId, testSize string, db *sql.DB) error {
+	stmtDelete, err := db.Prepare(`DELETE FROM forecast WHERE item=$1 AND test_size=$2`); if err != nil {
 		defer stmtDelete.Close()
 		return err
 	}
 	defer stmtDelete.Close()
-	_, deleteError := stmtDelete.Exec(itemId); if deleteError != nil {
+	_, deleteError := stmtDelete.Exec(itemId, testSize); if deleteError != nil {
 		return deleteError
 	}
 	return nil
