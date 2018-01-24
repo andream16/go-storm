@@ -112,7 +112,7 @@ func deleteForecast(w http.ResponseWriter, r *http.Request, db *sql.DB) (interfa
 	decodeForecastsErr := json.NewDecoder(r.Body).Decode(&forecasts); if decodeForecastsErr != nil {
 		return response.Response{Status: "Bad Request", Message: "Bad body"}, "badRequest"
 	}
-	deleteForecastsError := service.DeleteForecast(forecasts.Item, db); if deleteForecastsError != nil {
+	deleteForecastsError := service.DeleteForecast(forecasts.Item, forecasts.TestSize, db); if deleteForecastsError != nil {
 		return response.Response{Status: "Internal Server Error", Message: deleteForecastsError.Error()}, "serverError"
 	}
 	return response.Response{Status: "Ok", Message: fmt.Sprintf("Successfully deleted forecasts for item %s", forecasts.Item)}, ""
