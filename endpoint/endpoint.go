@@ -19,6 +19,7 @@ import (
 	categoryHandler "github.com/andream16/go-storm/api/feature/category/handler"
 	currencyHandler "github.com/andream16/go-storm/api/feature/currency/handler"
 	trendHandler "github.com/andream16/go-storm/api/feature/trend/handler"
+	statisticsHandler "github.com/andream16/go-storm/api/feature/statistics/handler"
 	amazonHandler "github.com/andream16/go-storm/api/feature/amazon/handler"
 )
 
@@ -38,6 +39,7 @@ func InitializeEndpoint(conf *configuration.Configuration, db *sql.DB) {
 	mux.HandleFunc("/api/category", 		categoryHandler.CategoryHandler(db))
 	mux.HandleFunc("/api/currency", 		currencyHandler.CurrencyHandler(db))
 	mux.HandleFunc("/api/trend", 			trendHandler.TrendHandler(db))
+	mux.HandleFunc("/api/statistics", 	statisticsHandler.StatisticsHandler(db))
 	mux.HandleFunc("/api/amazon", 		amazonHandler.AmazonHandler(db))
 	port := strconv.Itoa(conf.Server.Port)
 	n := negroni.Classic(); n.Use(c); n.UseHandler(mux)

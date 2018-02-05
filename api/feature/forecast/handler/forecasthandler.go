@@ -12,7 +12,7 @@ import (
 	"fmt"
 )
 
-var itemHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) (interface{}, string) {
+var forecastHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) (interface{}, string) {
 	"GET"     : getForecast,
 	"POST"    : postForecast,
 	"PUT"  	  : putForecast,
@@ -21,7 +21,7 @@ var itemHandlers = map[string]func(http.ResponseWriter, *http.Request, *sql.DB) 
 
 func ForecastHandler(db *sql.DB) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		forecastHandlersMap, ok := itemHandlers[r.Method];
+		forecastHandlersMap, ok := forecastHandlers[r.Method];
 		if ok {
 			res, errorMessage := functionmapper.FunctionMapper(w, r, db, forecastHandlersMap);
 			if errorMessage != "" {
